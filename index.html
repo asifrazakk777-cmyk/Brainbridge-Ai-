@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07152d">
+<meta name="description" content="Brainbridge AI: Class 10 Physics and Chemistry interactive study app">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Brainbridge AI">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Brainbridge AI — Interactive Waves Tutor</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+<header class="head">
+<div class="brand"><div class="brand-lockup"><div class="brand-mark" aria-label="Brainbridge AI logo"><svg viewBox="0 0 64 64" role="img" aria-label="Brain and bridge logo"><defs><linearGradient id="bbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5df4ff"/><stop offset="1" stop-color="#4387ff"/></linearGradient></defs><path d="M32 10c-5-7-16-4-17 5-8 1-10 11-5 16-5 7 0 16 8 16h14V10Z" fill="none" stroke="url(#bbg)" stroke-width="3.2" stroke-linecap="round"/><path d="M32 10c5-7 16-4 17 5 8 1 10 11 5 16 5 7 0 16-8 16H32V10Z" fill="none" stroke="url(#bbg)" stroke-width="3.2" stroke-linecap="round"/><path d="M32 12v35M23 18l4 5-4 5m18-10-4 5 4 5M10 51h44M14 51c4-8 10-12 18-12s14 4 18 12M7 57h50" fill="none" stroke="url(#bbg)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h1><span class="asif">Brainbridge</span> <span class="brand-ai">AI</span></h1><small>LEARN&nbsp; • &nbsp;EXPLORE&nbsp; • &nbsp;EXCEL</small><div class="brand-sub">Interactive Waves Tutor <span>•</span> Class 10 Physics</div></div></div><div class="actions header-actions"><button id="lang">Roman Urdu</button><button id="theme" aria-label="Toggle light or dark theme">☀️ / 🌙</button></div></div>
+<nav class="nav" aria-label="Main navigation"><button data-p="home" class="active">Home</button><button data-p="learn">Physics</button><button data-p="chemistry">Chemistry</button><button data-p="quiz">Quizzes</button><button data-p="lab">Animation Lab</button><button data-p="formula">Formula Sheet</button></nav><div class="progress"><i id="prog"></i></div>
+</header>
+
+<main>
+<section id="home" class="page active">
+<div class="card hero"><span class="badge">BRAINBRIDGE AI • CLASS 10</span><h2 class="wave-title">Learn smarter. <span class="asif">Explore better.</span></h2><p>Your study space for Physics and Chemistry. Choose a section below — each opens separately, without searching through a long home page.</p><p id="homeprog" class="small" style="display:none"></p><div class="stat"><div><b id="statTopics">0%</b><span>Physics Topics</span></div><div><b id="statQuiz">0%</b><span>Best Quiz</span></div><div><b>2</b><span>Subjects</span></div></div></div>
+
+<div class="bb-game-panel card">
+  <div class="bb-game-top"><div><span class="bb-kicker">YOUR LEARNING JOURNEY</span><h2>Level up your mind ✦</h2><p class="small">Study • Practice • Unlock achievements</p></div><div class="bb-level-orb"><span id="bbLevel">1</span><small>LEVEL</small></div></div>
+  <div class="bb-xp-row"><b id="bbXpText">0 / 100 XP</b><span id="bbXpTotal">✨ 0 XP total</span></div><div class="bb-xp-track"><i id="bbXpBar"></i></div>
+  <div class="bb-game-stats"><div><span>🔥</span><b id="bbStreak">0</b><small>Day streak</small></div><div><span>⚡</span><b id="bbTodayXp">0</b><small>XP today</small></div><div><span>🏆</span><b id="bbBadgeCount">0/6</b><small>Badges</small></div></div>
+  <h3 class="bb-ach-title">Achievement collection</h3><div class="bb-badges" id="bbBadges"></div>
+</div>
+<div class="home-launch-grid">
+<button class="launch-tile physics-tile" onclick="go('learn')"><span class="launch-icon">〰</span><strong>Physics</strong><small>Lessons, definitions and examples</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile chemistry-tile" onclick="go('chemistry')"><span class="launch-icon">⚗</span><strong>Chemistry</strong><small>Acid, Base & Salt • Carbon and Its Compounds</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile quiz-tile" onclick="go('quiz')"><span class="launch-icon">✓</span><strong>Quizzes</strong><small>Test your understanding and track results</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile lab-tile" onclick="go('lab')"><span class="launch-icon">◉</span><strong>Animation Lab</strong><small>Interactive Physics and Chemistry models</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile formula-tile" onclick="go('formula')"><span class="launch-icon">∑</span><strong>Formula Sheet</strong><small>Physics and Chemistry formulas</small><span class="launch-arrow">Open section →</span></button>
+</div>
+</section>
+
+<section id="learn" class="page"><div class="card"><div class="section-heading"><h2>📚 Physics</h2><button onclick="go('home')">← Home</button></div><p class="small">Choose a topic from the list. Use Previous / Next in the lesson to move without returning to the list.</p><p class="small">Topic select karein. Definitions, examples, misconceptions aur animations explore karein.</p><div id="topics" class="topic-list"></div></div><div id="detail" class="card"></div></section>
+
+<section id="lab" class="page"><div class="card"><div class="section-heading"><h2>⚙️ Animation Lab</h2><button onclick="go('home')">← Home</button></div><p>Simplified educational models. Play, pause, reset aur speed control use karein.</p><div class="actions"><button onclick="lab('trans')">〰 Transverse</button><button onclick="lab('long')">↔ Longitudinal</button><button onclick="lab('reflect')">↩ Reflection</button><button onclick="lab('refract')">↪ Refraction</button><button onclick="lab('diff')">◉ Diffraction</button><button onclick="lab('ripple')">🌊 Ripple Tank</button><button onclick="lab('pend')">⚖ Pendulum</button></div><h3 style="margin:18px 0 8px;color:#70f5c1">🧪 Chemistry Animations — Acid, Base and Salt</h3><p class="small">Physics animations ke neeche Chemistry ke interactive visual models.</p><div class="actions"><button onclick="lab('ph')">🧪 pH Scale</button><button onclick="lab('neutral')">⚗️ Neutralization</button><button onclick="lab('ions')">＋ Ion Formation</button><button onclick="lab('indicator')">🎨 Indicators</button><button onclick="lab('buffer')">🛡️ Buffer Solution</button></div></div><div id="labbox" class="card"></div></section>
+
+<section id="quiz" class="page"><div class="card"><div class="section-heading"><h2>🧠 Quizzes</h2><button onclick="go('home')">← Home</button></div><h3>Physics Quiz</h3><p class="small">50 improved questions • Concepts + formulas + applications.</p><div id="quizbox"></div></div><div class="card"><h2>🧪 Chemistry Quiz — Acid, Base and Salt</h2><p class="small">Class 10 Chemistry chapter practice. Restart any time to begin again.</p><div id="chemQuiz"></div></div></section>
+
+<section id="formula" class="page"><div class="card"><div class="section-heading"><h2>🧮 Formula Sheet</h2><button onclick="go('home')">← Home</button></div><h3>Formula Calculator</h3><select id="fsel" onchange="calcUI()"></select><div id="calc"></div></div><div id="sheet" class="card"></div></section>
+
+<section id="about" class="page"><div class="card"><h2>ℹ️ About & Notes</h2><p><b>Brainbridge AI</b> is an offline Class 10 Physics study tool designed to make wave concepts visual, interactive and easier to revise.</p><h3>📌 Core Notes</h3><p>Sound is mechanical; light and radio waves are electromagnetic. Refraction normally keeps frequency constant while speed and wavelength may change.</p><h3>📖 Glossary</h3><p><b>Amplitude</b> — maximum displacement.<br><b>Wavelength</b> — distance between consecutive same-phase points.<br><b>Frequency</b> — cycles per second.<br><b>Time Period</b> — time for one cycle.<br><b>Crest</b> — highest transverse point.<br><b>Trough</b> — lowest transverse point.<br><b>Compression</b> — closely packed region in a longitudinal wave.<br><b>Rarefaction</b> — spread-out region in a longitudinal wave.<br><b>Wavefront</b> — equal-phase points joined together.</p><div class="actions"><button onclick="notes()">⬇️ Download Notes</button><button onclick="window.print()">🖨️ Print Notes</button><button onclick="reset()">Reset Progress</button></div></div></section>
+<section id="chemistry" class="page">
+<div class="section-heading card"><h2>🧪 Chemistry</h2><button onclick="go('home')">← Home</button></div>
+<div class="card hero chem-hero"><span class="badge">BRAINBRIDGE AI • CLASS 10 CHEMISTRY</span><h2 class="wave-title">Acid, Base and Salt</h2><p>Sindh Textbook Board Class X Chemistry — chapter-based learning in simple English with Roman Urdu support, key definitions, examples, formulas and practice questions.</p><div class="chips"><span class="chip">14 teaching periods</span><span class="chip">2 assessment periods</span><span class="chip">15% weightage</span></div></div>
+<div class="chapter-switch"><button onclick="document.getElementById('chemDetail').scrollIntoView({behavior:'smooth',block:'start'})">Chapter 1 • Acid, Base & Salt</button><button onclick="document.getElementById('carbonDetail').scrollIntoView({behavior:'smooth',block:'start'})">Chapter 2 • Carbon</button></div>
+<div id="chemDetail" class="card lesson-card"><h2>Start with a topic</h2><p>Select a topic from the topic list.</p></div>
+<details class="topic-drawer"><summary>📘 Browse Acid, Base and Salt topics</summary><div style="padding:0 12px 10px"><input id="chemSearch" class="search" placeholder="🔎 Search topics"><div id="chemTopics" class="topic-list"></div></div></details>
+
+<div class="card hero chem-hero" style="margin-top:22px"><span class="badge">BRAINBRIDGE AI • CLASS 10 CHEMISTRY • CHAPTER 2</span><h2 class="wave-title">Carbon and Its Compounds</h2><p>Learn carbon compounds through short, easy explanations, examples, important formulas and practice questions.</p><div class="chips"><span class="chip">Organic Chemistry</span><span class="chip">Topic-wise learning</span><span class="chip">Practice quiz</span></div></div>
+<div id="carbonDetail" class="card lesson-card"><h2>Start with a topic</h2><p>Select a topic from the topic list.</p></div>
+<details class="topic-drawer"><summary>📘 Browse Carbon and Its Compounds topics</summary><div style="padding:0 12px 10px"><input id="carbonSearch" class="search" placeholder="🔎 Search topics"><div id="carbonTopics" class="topic-list"></div></div></details>
+<details class="resource-drawer"><summary>🧠 Carbon and Its Compounds — Practice Quiz</summary><p class="small">Test your understanding of this chapter. You can restart the quiz anytime.</p><div id="carbonQuiz"></div></details>
+</section>
+</main>
+<footer>🌊 <b>Brainbridge AI</b> • Learn • Visualize • Calculate • Practice</footer>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/wave-renderers.js"></script>
+<script src="js/optics-renderers.js"></script>
+<script src="js/chemistry.js"></script>
+<script src="js/carbon.js"></script>
+<script src="js/chemistry-animations.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

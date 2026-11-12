@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07152d">
+<title>Brainbridge AI — Interactive Waves Tutor</title>
+<style>
+:root{--bg:#061426;--card:#0c203b;--card2:#102b4b;--text:#eaf7ff;--muted:#a9c3d8;--cyan:#38d9ff;--blue:#4d8dff;--green:#4ade80;--yellow:#ffd166;--red:#ff667d;--purple:#a78bfa;--line:#214563;--shadow:0 12px 35px rgba(0,0,0,.25)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 10%,rgba(56,217,255,.08),transparent 28%),radial-gradient(circle at 85% 85%,rgba(77,141,255,.08),transparent 30%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{padding:10px 14px;min-height:44px;border:1px solid var(--line);border-radius:11px;background:#12304b;color:var(--text);font-weight:750;cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}button:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 7px 18px rgba(0,0,0,.22)}button:active{transform:translateY(0) scale(.98)}
+.primary{background:linear-gradient(135deg,#079bc5,#0879b5);color:#fff;border-color:#31c9ef}
+.app{width:min(1120px,100%);margin:auto;padding:10px}
+.head,.card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow)}
+.head{position:sticky;top:7px;z-index:20;backdrop-filter:blur(14px)}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand h1{margin:0;color:var(--cyan);font-size:clamp(1.55rem,4vw,2.15rem)}.brand small{color:var(--muted)}
+.asif{color:#fff;background:linear-gradient(90deg,var(--cyan),#8be9ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.nav{display:flex;gap:7px;flex-wrap:wrap;overflow-x:auto;margin-top:12px;padding-bottom:2px}.nav button{white-space:nowrap}.nav button.active{background:var(--cyan);color:#062033;border-color:var(--cyan)}
+.search,input,select{background:#071a2d;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;outline:none}.search{width:100%;margin-top:10px}input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(56,217,255,.1)}
+.page{display:none;animation:pageIn .35s ease}.page.active{display:block}@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.topic-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.topic-list button{text-align:left}.done{border-left:5px solid var(--green)}
+.canvas{display:block;width:100%;height:330px;background:radial-gradient(circle at 50% 50%,rgba(56,217,255,.035),transparent 60%),#030e1b;border-radius:14px;border:1px solid #173a58;touch-action:none}
+.formula{font-size:1.35rem;color:var(--cyan);font-weight:850}.answer{padding:11px;border-radius:11px;margin-top:10px;background:#102b45;border:1px solid var(--line)}.ok{background:#0d4b2c;border-color:#2c9d62}.bad{background:#572331;border-color:#ad4059}
+.progress{height:8px;background:#17324b;border-radius:8px;overflow:hidden;margin-top:10px}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.quizopt{display:block;width:100%;text-align:left;margin:8px 0}.hidden{display:none!important}
+.hero{position:relative;overflow:hidden;min-height:240px;display:flex;flex-direction:column;justify-content:center}.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.hero:before{width:280px;height:280px;right:-80px;top:-100px;border:1px solid rgba(56,217,255,.15);animation:pulseRing 4s infinite ease-in-out}.hero:after{width:170px;height:170px;right:25px;top:-45px;border:1px solid rgba(56,217,255,.12);animation:pulseRing 4s 1s infinite ease-in-out}@keyframes pulseRing{0%,100%{transform:scale(.85);opacity:.25}50%{transform:scale(1.12);opacity:.7}}
+.wave-title{font-size:clamp(1.7rem,5vw,2.6rem);margin:.1em 0}.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.stat div{padding:11px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid var(--line);text-align:center}.stat b{display:block;color:var(--cyan);font-size:1.25rem}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:#102a45;border-radius:999px;padding:6px 10px;font-size:.88rem}.lab-controls{position:sticky;bottom:8px;z-index:5;background:rgba(6,20,38,.88);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:13px;padding:9px}.range{accent-color:var(--cyan);width:130px;vertical-align:middle}.calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.calc-grid input{width:100%}.small{color:var(--muted);font-size:.9rem}.badge{display:inline-block;padding:4px 9px;border-radius:999px;background:#123b54;color:var(--cyan);font-size:.8rem;font-weight:800}footer{text-align:center;color:var(--muted);padding:20px 5px}
+body.light{--bg:#edf7fb;--card:#fff;--card2:#f5fbff;--text:#102235;--muted:#506779;--line:#c7dce7;--shadow:0 8px 24px rgba(20,70,90,.1)}
+body.light .search,body.light input,body.light select{background:#f5fbff;color:#102235}body.light .canvas{background:#061426}
+@media(max-width:760px){.head{position:relative;top:auto}.grid,.topic-list{grid-template-columns:1fr}.canvas{height:280px}.brand{align-items:flex-start;flex-direction:column}.stat{grid-template-columns:1fr}}
+@media(max-width:500px){body{font-size:15px}.app{padding:6px}.head,.card{padding:12px;border-radius:14px}.nav{flex-wrap:nowrap}.nav button{flex:0 0 auto;min-height:42px}.actions button{flex:1 1 auto}.calc-grid{grid-template-columns:1fr}.canvas{height:245px}.range{width:100px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+/* Brainbridge AI modern interface refresh — content and learning logic preserved */
+:root{--bg:#041022;--card:#081b33;--card2:#0b2545;--text:#eef9ff;--muted:#9dbbd4;--cyan:#28e2f3;--blue:#428cff;--green:#4ce0ad;--yellow:#ffd166;--red:#ff718d;--purple:#b18aff;--line:rgba(72,157,220,.28);--shadow:0 18px 46px rgba(0,0,0,.24)}
+body{background:radial-gradient(ellipse at 8% 0%,rgba(25,205,240,.12),transparent 32%),radial-gradient(ellipse at 92% 18%,rgba(69,107,255,.12),transparent 28%),linear-gradient(160deg,#030b18,#06172d 55%,#041022);letter-spacing:.005em}
+.app{width:min(1240px,100%);padding:16px}
+.head,.card{background:linear-gradient(145deg,rgba(9,29,54,.96),rgba(7,24,47,.97));border:1px solid var(--line);border-radius:22px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.head{top:10px;backdrop-filter:blur(22px);background:rgba(4,17,35,.88);border-color:rgba(56,190,242,.3);padding:17px 20px}
+.brand{align-items:center;gap:16px}.brand-lockup{display:flex;align-items:center;gap:14px;min-width:0}.brand-mark{width:66px;height:66px;display:grid;place-items:center;border:1px solid rgba(40,226,243,.3);border-radius:19px;background:linear-gradient(145deg,rgba(27,218,239,.12),rgba(64,118,255,.08));box-shadow:inset 0 0 24px rgba(35,195,255,.08),0 0 24px rgba(28,201,255,.08);flex-shrink:0}.brand-mark svg{width:57px;height:57px;filter:drop-shadow(0 0 8px rgba(38,218,255,.28))}
+.brand h1{font-size:clamp(1.55rem,4vw,2.35rem);letter-spacing:-.045em;line-height:1.12}.brand-ai{color:#42e9ef}.brand small{display:block;letter-spacing:.22em;font-size:.7rem;color:#83cde8;font-weight:800;margin-top:5px}.brand-sub{font-size:.82rem;color:var(--muted);margin-top:6px}.brand-sub span{color:var(--cyan);padding:0 5px}.header-actions{justify-content:flex-end}.header-actions button{background:rgba(11,43,75,.8)}
+.asif{background:linear-gradient(95deg,#f5fbff 0%,#75e9ff 55%,#55a5ff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav{gap:8px;margin-top:18px}.nav button{border-radius:13px;padding:10px 17px;background:rgba(13,42,72,.7);border-color:rgba(83,157,215,.24);font-weight:700}.nav button.active{background:linear-gradient(120deg,#19cbe7,#3787ff);color:#031629;border-color:transparent;box-shadow:0 5px 22px rgba(28,195,240,.2)}
+button{border-radius:13px;background:rgba(15,43,73,.92);border-color:rgba(83,157,215,.28);font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.08)}button:hover{box-shadow:0 8px 24px rgba(21,194,242,.13)}.primary{background:linear-gradient(115deg,#11c9df,#2785ff);color:#031628;border:0;box-shadow:0 8px 22px rgba(18,178,232,.18)}
+.search,input,select{background:#04162a;border-color:rgba(82,158,214,.3);border-radius:13px}.search{margin-top:14px;padding:13px 15px}.progress{height:7px;background:rgba(94,143,181,.18);border-radius:99px}.progress i{background:linear-gradient(90deg,#2ce7e8,#398bff,#a67cff);border-radius:99px}
+.hero{min-height:270px;padding:clamp(22px,4vw,38px);background:radial-gradient(ellipse at 82% 42%,rgba(28,194,255,.12),transparent 35%),linear-gradient(125deg,rgba(9,35,65,.98),rgba(5,23,46,.98));border-color:rgba(41,194,238,.42)}
+.hero:before{width:340px;height:340px;right:-70px;top:-115px;border:1px solid rgba(56,217,255,.18)}.hero:after{width:220px;height:220px;right:0;top:-52px;border-color:rgba(70,133,255,.2)}
+.badge{background:rgba(14,66,99,.58);border:1px solid rgba(40,226,243,.26);padding:7px 12px;letter-spacing:.07em}.wave-title{max-width:760px;font-weight:850;letter-spacing:-.035em;line-height:1.12}.hero p{max-width:780px;color:#bdd4e8}.stat div{background:rgba(3,16,34,.4);border-color:rgba(82,158,214,.2);border-radius:16px;padding:14px}.stat b{font-size:1.45rem}
+.grid{gap:15px}.grid>.card{min-height:140px}.card h2,.card h3{letter-spacing:-.02em}.card h3{color:#e8f7ff}.chips{gap:8px}.chip{background:rgba(12,49,78,.65);border-color:rgba(68,166,218,.23);border-radius:999px;padding:7px 12px}
+.topic-list button{text-align:left;border-radius:14px;padding:13px 15px;background:rgba(5,23,44,.68)}.topic-list button.done{border-left:4px solid var(--green);background:rgba(13,74,66,.18)}
+.answer{background:rgba(13,42,69,.86);border-color:rgba(76,157,213,.24);border-radius:14px}.ok{background:rgba(13,91,56,.45)}.bad{background:rgba(107,30,52,.45)}
+.canvas{border-radius:18px;border-color:rgba(50,183,232,.28);background-color:#031021}.lab-controls{background:rgba(4,17,35,.9);border-color:rgba(72,157,220,.25);border-radius:16px}
+.formula{color:#42e9ef}.page.active{animation:pageIn .28s ease}
+footer{padding:26px 5px;color:#83a9c5;letter-spacing:.05em}
+body.light{--bg:#edf6fc;--card:#fff;--card2:#f4faff;--text:#10243a;--muted:#526c82;--line:#c8dfec;--shadow:0 12px 32px rgba(20,70,90,.09);background:radial-gradient(ellipse at 8% 0%,rgba(25,205,240,.13),transparent 32%),#edf6fc}
+body.light .head{background:rgba(255,255,255,.9)}body.light .card{background:linear-gradient(145deg,#fff,#f4faff)}body.light .hero{background:linear-gradient(125deg,#e6f8ff,#f6faff)}body.light .hero p{color:#49657c}body.light .topic-list button,body.light .search,body.light input,body.light select{background:#f7fbff;color:#102235}body.light .card h3{color:#10243a}body.light .brand-sub{color:#526c82}
+@media(max-width:760px){.app{padding:9px}.head{top:0;padding:14px}.brand{flex-direction:row;align-items:center}.brand-mark{width:52px;height:52px;border-radius:15px}.brand-mark svg{width:46px;height:46px}.brand-lockup{gap:10px}.brand small{letter-spacing:.13em;font-size:.62rem}.brand-sub{font-size:.72rem}.header-actions{flex-wrap:wrap;gap:6px}.header-actions button{padding:8px 10px;min-height:38px}.head,.card{border-radius:17px;padding:15px}.grid,.topic-list{grid-template-columns:1fr}.canvas{height:280px}.stat{grid-template-columns:repeat(3,1fr)}.stat div{padding:10px 6px}.stat b{font-size:1.15rem}}
+@media(max-width:500px){body{font-size:14px}.app{padding:7px}.brand{align-items:flex-start}.brand h1{font-size:1.48rem}.brand-sub{max-width:190px}.brand small{font-size:.55rem}.brand-mark{width:45px;height:45px}.brand-mark svg{width:40px;height:40px}.header-actions{flex-direction:column;align-items:stretch}.header-actions button{min-height:35px;font-size:.78rem;padding:6px 8px}.nav{margin-top:14px}.nav button{padding:9px 12px}.hero{min-height:0;padding:20px}.wave-title{font-size:1.8rem}.stat{gap:6px}.stat div{font-size:.8rem}.stat b{font-size:1.05rem}.calc-grid{grid-template-columns:1fr}.canvas{height:245px}.range{width:100px}}
+
+</style>
+
+<style id="bb-wave-pro-style">
+#labbox{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(4,20,48,.98),rgba(5,31,64,.94));border:1px solid rgba(45,190,255,.28);box-shadow:0 18px 55px rgba(0,120,255,.10),inset 0 1px rgba(255,255,255,.035)}
+#labbox h2{letter-spacing:-.025em}
+#labbox .canvas{display:block;width:100%;height:clamp(250px,42vw,390px);border-radius:18px;border:1px solid rgba(70,195,255,.22);background:radial-gradient(ellipse at 50% 45%,rgba(13,74,130,.35),rgba(2,11,30,.96) 75%);box-shadow:inset 0 0 45px rgba(0,145,255,.08),0 8px 28px rgba(0,0,0,.22)}
+#labbox .lab-controls{position:sticky;bottom:6px;z-index:2;padding:10px;border-radius:15px;background:rgba(5,19,42,.78);border:1px solid rgba(61,190,255,.18);backdrop-filter:blur(12px)}
+#labbox .actions button{border-radius:12px}
+#labbox #labtext{padding:12px 14px;border-radius:12px;background:rgba(28,173,255,.065);border:1px solid rgba(49,194,255,.16);line-height:1.65}
+@media(prefers-reduced-motion:reduce){#labbox .canvas{scroll-behavior:auto}}
+</style>
+
+
+<style id="bb-optics-pro-style">
+#labbox .canvas{
+  border:1px solid rgba(64,207,255,.32)!important;
+  background:radial-gradient(ellipse at 50% 45%,rgba(14,82,139,.34),rgba(2,10,28,.98) 76%)!important;
+  box-shadow:inset 0 0 50px rgba(0,157,255,.11),0 12px 35px rgba(0,0,0,.25)!important;
+}
+#labbox .lab-controls{border:1px solid rgba(62,205,255,.22)!important;box-shadow:0 8px 26px rgba(0,0,0,.18)}
+@keyframes bbLabAura{0%,100%{opacity:.45}50%{opacity:.9}}
+#labbox{isolation:isolate}
+#labbox:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 15% 0%,rgba(0,196,255,.06),transparent 45%),radial-gradient(ellipse at 90% 100%,rgba(122,95,255,.07),transparent 42%);animation:bbLabAura 8s ease-in-out infinite}
+#labbox>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){#labbox:after{animation:none}}
+</style>
+
+<style id="bb-chemistry-style">
+.chem-hero{background:radial-gradient(ellipse at 85% 30%,rgba(67,255,190,.13),transparent 35%),linear-gradient(125deg,rgba(8,47,59,.98),rgba(5,23,46,.98));border-color:rgba(76,224,173,.38)}
+.chem-hero .badge{color:#79f5c3;border-color:rgba(76,224,173,.3)}#chemTopics button{text-align:left}#chemDetail .formula{color:#69efb7}#chemDetail .answer{line-height:1.7}.chem-option{display:block;width:100%;text-align:left;margin:8px 0}.chem-progress{color:var(--green);font-weight:800}
+body.light .chem-hero{background:linear-gradient(125deg,#e6fff5,#f5faff)}
+</style>
+
+<style id="bb-clean-study-layout">
+/* Focused study layout: keep the lesson in view and tuck reference lists away. */
+.study-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.study-tools select{flex:1;min-width:170px}
+.topic-drawer{border:1px solid var(--line);border-radius:14px;background:rgba(4,20,39,.42);margin:10px 0 14px;overflow:hidden}
+.topic-drawer summary,.resource-drawer summary{cursor:pointer;padding:12px 14px;font-weight:800;color:var(--cyan);list-style:none}
+.topic-drawer summary::-webkit-details-marker,.resource-drawer summary::-webkit-details-marker{display:none}
+.topic-drawer summary:after,.resource-drawer summary:after{content:'＋';float:right}
+.topic-drawer[open] summary:after,.resource-drawer[open] summary:after{content:'−'}
+.topic-drawer .topic-list{padding:0 12px 12px;max-height:42vh;overflow:auto}
+.resource-drawer{border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden;background:rgba(4,20,39,.32)}
+.resource-drawer>*:not(summary){margin-left:12px;margin-right:12px}
+.lesson-card{scroll-margin-top:12px}
+.lesson-nav{display:grid;grid-template-columns:1fr minmax(110px,1.3fr) 1fr;gap:8px;margin-top:14px;position:sticky;bottom:8px;z-index:8;padding:9px;border:1px solid var(--line);border-radius:15px;background:rgba(4,17,35,.94);backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.lesson-nav button{min-width:0;padding:9px 7px}.lesson-nav select{width:100%;min-width:0;font-size:.88rem}
+.chapter-switch{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.chapter-switch button{flex:1 1 140px}.chapter-switch button.active{background:linear-gradient(120deg,#19cbe7,#3787ff);color:#031629}
+@media(max-width:500px){.lesson-nav{grid-template-columns:1fr 1.4fr 1fr;gap:5px;padding:6px}.lesson-nav button{font-size:.78rem}.topic-drawer .topic-list{max-height:34vh}}
+</style>
+
+
+<style id="bb-navigation-redesign">
+.head{position:sticky!important;top:0!important;z-index:30;margin:0 -2px 14px;border-radius:0 0 18px 18px}
+.nav{display:flex;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:3px 1px 7px;position:sticky;top:0;z-index:31}
+.nav::-webkit-scrollbar{display:none}.nav button{flex:0 0 auto}
+.home-launch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:14px 0 22px}
+.launch-tile{min-height:165px;text-align:left;padding:17px;display:flex;flex-direction:column;align-items:flex-start;gap:7px;border-radius:19px;background:linear-gradient(145deg,rgba(13,48,78,.98),rgba(7,27,51,.98));border:1px solid rgba(75,166,220,.3)}
+.launch-tile strong{font-size:1.15rem}.launch-tile small{color:var(--muted);font-weight:500;line-height:1.4}.launch-icon{font-size:1.6rem;color:var(--cyan);width:43px;height:43px;display:grid;place-items:center;border-radius:13px;background:rgba(39,208,235,.1);border:1px solid rgba(39,208,235,.2)}
+.launch-arrow{margin-top:auto;color:var(--cyan);font-size:.88rem;font-weight:800}.chemistry-tile .launch-icon{color:#72efbb}.quiz-tile .launch-icon{color:#ffd166}.lab-tile .launch-icon{color:#b9a0ff}.formula-tile .launch-icon{color:#72c8ff}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.section-heading h2{margin:0}.section-heading button{flex:0 0 auto}
+#about{display:none!important}
+@media(max-width:760px){.head{position:sticky!important;top:0!important}.brand{flex-direction:row!important;align-items:center!important}.brand-sub{display:none}.brand-mark{width:48px;height:48px}.brand-mark svg{width:42px;height:42px}.header-actions{gap:5px}.header-actions button{padding:7px 9px;min-height:38px}.home-launch-grid{gap:9px}.launch-tile{min-height:155px;padding:13px}.nav{margin-top:10px}.stat{grid-template-columns:repeat(3,1fr)}.stat div{padding:8px 5px}.stat b{font-size:1.15rem}}
+@media(max-width:390px){.home-launch-grid{grid-template-columns:1fr}.launch-tile{min-height:125px}.brand h1{font-size:1.45rem}}
+</style>
+
+
+<style id="bb-modern-engaging-overhaul">
+/* Brainbridge AI — premium engaging UI polish; all original content/scripts retained */
+:root{
+ --bg:#030817;--card:#09172c;--card2:#0d2140;--text:#eff8ff;--muted:#9bb5d1;
+ --cyan:#45efff;--blue:#668cff;--green:#55f2bd;--purple:#b89cff;
+ --line:rgba(113,181,255,.2);--shadow:0 18px 50px rgba(0,0,0,.32)
+}
+html{scroll-behavior:smooth;scroll-padding-top:115px}
+body{
+ background:
+ radial-gradient(ellipse at 0% 0%,rgba(27,220,255,.13),transparent 35%),
+ radial-gradient(ellipse at 100% 15%,rgba(105,91,255,.14),transparent 30%),
+ radial-gradient(ellipse at 50% 100%,rgba(15,111,180,.1),transparent 38%),
+ #030817;
+ color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif
+}
+.app{max-width:1320px;padding:18px}
+.head{
+ border:1px solid rgba(89,204,255,.22)!important;
+ border-radius:0 0 24px 24px!important;
+ background:rgba(3,12,29,.82)!important;
+ box-shadow:0 14px 40px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.04)!important;
+ backdrop-filter:blur(24px) saturate(145%)!important
+}
+.brand-mark{border-radius:20px!important;position:relative;overflow:hidden}
+.brand-mark:after{content:"";position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.15),transparent 60%);transform:translateX(-70%);animation:bbShine 7s ease-in-out infinite}
+@keyframes bbShine{0%,65%{transform:translateX(-70%)}85%,100%{transform:translateX(70%)}}
+.brand h1{font-weight:900;letter-spacing:-.06em;text-shadow:0 0 28px rgba(69,239,255,.13)}
+.brand small{letter-spacing:.25em!important}
+.nav{gap:7px!important}
+.nav button{border-radius:999px!important;padding:10px 17px!important;transition:all .25s ease!important}
+.nav button.active{box-shadow:0 0 0 4px rgba(69,239,255,.09),0 8px 24px rgba(37,183,255,.2)!important}
+button{transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s,filter .22s!important}
+button:hover{filter:brightness(1.12);transform:translateY(-3px)!important}
+button:active{transform:scale(.97)!important}
+.primary{background:linear-gradient(115deg,#38e8ef,#548cff)!important;color:#031225!important;font-weight:850!important}
+.card{
+ border:1px solid rgba(108,174,235,.18)!important;border-radius:22px!important;
+ background:linear-gradient(145deg,rgba(10,27,51,.94),rgba(6,18,37,.96))!important;
+ box-shadow:0 14px 38px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.025)!important;
+ transition:border-color .25s,transform .25s,box-shadow .25s
+}
+.card h2{font-weight:850;letter-spacing:-.045em}
+.card h3{font-weight:800;letter-spacing:-.025em}
+.hero{isolation:isolate;border-radius:26px!important;min-height:290px!important}
+.hero:before,.hero:after{z-index:-1}
+.hero .badge{backdrop-filter:blur(8px)}
+.wave-title{font-size:clamp(2rem,5.3vw,3.5rem)!important;letter-spacing:-.065em!important}
+.hero p{font-size:1.02rem;line-height:1.8}
+.stat div{border-radius:18px!important;background:linear-gradient(145deg,rgba(22,56,91,.6),rgba(7,24,46,.55))!important}
+.stat b{background:linear-gradient(90deg,#52f3ff,#8ba7ff);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.home-launch-grid{gap:15px!important}
+.launch-tile{
+ position:relative;isolation:isolate;overflow:hidden;min-height:190px!important;
+ border-radius:23px!important;padding:21px!important;
+ background:linear-gradient(145deg,rgba(13,39,72,.96),rgba(5,19,39,.98))!important;
+ border:1px solid rgba(93,181,255,.22)!important;
+ box-shadow:0 13px 34px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.035)!important
+}
+.launch-tile:before{content:"";position:absolute;inset:auto -35px -70px auto;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(51,222,255,.12),transparent 70%);z-index:-1;transition:transform .4s}
+.launch-tile:hover:before{transform:scale(1.6)}
+.launch-icon{width:52px!important;height:52px!important;border-radius:17px!important;font-size:1.8rem!important;box-shadow:0 0 25px rgba(49,207,255,.08)}
+.launch-tile strong{font-size:1.25rem!important;letter-spacing:-.025em}
+.launch-tile small{font-size:.92rem!important;line-height:1.55!important}
+.launch-arrow{font-size:.92rem!important}
+.topic-list button{border-radius:15px!important;padding:14px 16px!important;line-height:1.45}
+.topic-list button:hover{border-color:rgba(69,239,255,.55)!important;background:rgba(18,64,102,.75)!important}
+.topic-list button.done{background:linear-gradient(90deg,rgba(25,124,100,.2),rgba(7,26,46,.7))!important}
+.answer{border-radius:16px!important;padding:15px!important}
+.formula{font-size:clamp(1.2rem,3vw,1.65rem)!important;letter-spacing:-.025em}
+.progress{height:9px!important;border-radius:99px!important;overflow:hidden}
+.progress i{box-shadow:0 0 15px rgba(69,239,255,.35)}
+input,select,.search{border-radius:14px!important;padding:12px 14px!important}
+.canvas{border-radius:20px!important}
+#labbox{border-radius:24px!important}
+#labbox .lab-controls{border-radius:18px!important}
+.lesson-nav{border-radius:20px!important;box-shadow:0 12px 34px rgba(0,0,0,.34)!important}
+details.topic-drawer,details.resource-drawer{border-radius:18px!important;border-color:rgba(108,174,235,.2)!important}
+details summary{padding:15px 17px!important}
+.page.active{animation:bbPageReveal .35s ease both}
+@keyframes bbPageReveal{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+footer{letter-spacing:.04em;font-size:.86rem}
+body.light{
+ --bg:#eff7ff;--text:#13263c;--muted:#5a728a;--line:rgba(51,113,170,.2);
+ background:radial-gradient(ellipse at 0% 0%,rgba(35,204,235,.12),transparent 35%),#eff7ff
+}
+body.light .head{background:rgba(248,252,255,.88)!important}
+body.light .card{background:linear-gradient(145deg,#fff,#f4f9ff)!important}
+body.light .launch-tile{background:linear-gradient(145deg,#fff,#edf6ff)!important}
+body.light .launch-tile small{color:#58718a}
+body.light .stat div{background:linear-gradient(145deg,#f0f9ff,#fff)!important}
+body.light .topic-list button{background:#f7fbff!important;color:#13263c}
+@media(min-width:900px){
+ .home-launch-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .launch-tile:first-child,.launch-tile:nth-child(2){min-height:205px!important}
+ .grid{gap:18px}
+}
+@media(max-width:760px){
+ .app{padding:8px!important}
+ .head{border-radius:0 0 18px 18px!important}
+ .hero{min-height:0!important;padding:23px!important}
+ .wave-title{font-size:2.05rem!important}
+ .launch-tile{min-height:155px!important;padding:15px!important}
+ .launch-icon{width:45px!important;height:45px!important}
+ .card{border-radius:18px!important;padding:15px!important}
+ .nav button{padding:9px 14px!important}
+ .stat div{border-radius:14px!important}
+}
+@media(max-width:390px){.home-launch-grid{grid-template-columns:1fr!important}.launch-tile{min-height:130px!important}}
+@media(prefers-reduced-motion:reduce){.brand-mark:after{animation:none}.page.active{animation:none}}
+</style>
+
+
+<style id="bb-gamification-style">
+.bb-game-panel{position:relative;overflow:hidden;background:radial-gradient(ellipse at 100% 0%,rgba(112,82,255,.18),transparent 38%),linear-gradient(145deg,#0b1d3b,#071329)!important;border:1px solid rgba(126,124,255,.28)!important}
+.bb-game-top{display:flex;justify-content:space-between;align-items:center;gap:15px}.bb-kicker{font-size:.7rem;letter-spacing:.18em;color:#8eafff;font-weight:900}.bb-game-top h2{margin:5px 0;font-size:clamp(1.35rem,4vw,2rem)}.bb-game-top p{margin:0}
+.bb-level-orb{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 20%,#a6faff,#4b8cff 48%,#7148db);box-shadow:0 0 30px #4d8dff55,inset 0 2px 8px #fff7;flex-shrink:0;color:#06142b}.bb-level-orb span{font-size:1.6rem;font-weight:950;line-height:1}.bb-level-orb small{font-size:.55rem;font-weight:900;letter-spacing:.12em}
+.bb-xp-row{display:flex;justify-content:space-between;gap:10px;margin:18px 0 8px;font-size:.9rem}.bb-xp-row b{color:#6ef4ff}.bb-xp-track{height:12px;border-radius:99px;background:#182c4b;overflow:hidden;border:1px solid #30456b}.bb-xp-track i{display:block;width:0;height:100%;background:linear-gradient(90deg,#39e8ef,#6c8dff,#c08aff);box-shadow:0 0 18px #5b8dff;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.bb-game-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}.bb-game-stats div{display:flex;flex-direction:column;align-items:center;padding:12px 5px;border-radius:15px;background:#ffffff08;border:1px solid #6b9bd51c}.bb-game-stats span{font-size:1.25rem}.bb-game-stats b{font-size:1.35rem;color:#fff}.bb-game-stats small{font-size:.75rem;color:#9bb5d1}
+.bb-ach-title{font-size:1rem;margin:15px 0 9px}.bb-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bb-ach{padding:10px 6px;text-align:center;border:1px solid #42618a44;border-radius:13px;background:#ffffff05;opacity:.42;filter:grayscale(1);transition:.3s}.bb-ach.unlocked{opacity:1;filter:none;border-color:#8e8cff66;background:linear-gradient(145deg,#6b6aff19,#36d9ff0b);box-shadow:inset 0 1px #ffffff0a}.bb-ach .em{font-size:1.45rem;display:block}.bb-ach strong{display:block;font-size:.72rem;margin-top:4px}.bb-ach small{font-size:.65rem;color:var(--muted)}
+.bb-float-xp{position:fixed;z-index:999;left:50%;top:38%;transform:translate(-50%,-50%);font-weight:1000;font-size:2rem;color:#72f6ff;text-shadow:0 0 24px #30caff;pointer-events:none;animation:bbFloat .95s ease forwards}.bb-confetti{position:fixed;z-index:998;pointer-events:none;width:8px;height:12px;border-radius:3px;animation:bbBurst 1s ease-out forwards}@keyframes bbFloat{0%{opacity:0;transform:translate(-50%,15px) scale(.6)}25%{opacity:1;transform:translate(-50%,-8px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-90px) scale(.9)}}@keyframes bbBurst{to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}
+.bb-correct-pop{animation:bbCorrect .55s ease}@keyframes bbCorrect{0%{transform:scale(.96)}45%{transform:scale(1.025);box-shadow:0 0 35px #47f3b855}100%{transform:scale(1)}}
+body.light .bb-game-panel{background:radial-gradient(ellipse at 100% 0%,#dcdcff,transparent 38%),linear-gradient(145deg,#fff,#eef5ff)!important}body.light .bb-game-stats b{color:#162c48}
+@media(max-width:430px){.bb-badges{grid-template-columns:repeat(2,1fr)}.bb-game-top{align-items:flex-start}.bb-level-orb{width:62px;height:62px}}
+@media(prefers-reduced-motion:reduce){.bb-float-xp,.bb-confetti{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="head">
+<div class="brand"><div class="brand-lockup"><div class="brand-mark" aria-label="Brainbridge AI logo"><svg viewBox="0 0 64 64" role="img" aria-label="Brain and bridge logo"><defs><linearGradient id="bbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5df4ff"/><stop offset="1" stop-color="#4387ff"/></linearGradient></defs><path d="M32 10c-5-7-16-4-17 5-8 1-10 11-5 16-5 7 0 16 8 16h14V10Z" fill="none" stroke="url(#bbg)" stroke-width="3.2" stroke-linecap="round"/><path d="M32 10c5-7 16-4 17 5 8 1 10 11 5 16 5 7 0 16-8 16H32V10Z" fill="none" stroke="url(#bbg)" stroke-width="3.2" stroke-linecap="round"/><path d="M32 12v35M23 18l4 5-4 5m18-10-4 5 4 5M10 51h44M14 51c4-8 10-12 18-12s14 4 18 12M7 57h50" fill="none" stroke="url(#bbg)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h1><span class="asif">Brainbridge</span> <span class="brand-ai">AI</span></h1><small>LEARN&nbsp; • &nbsp;EXPLORE&nbsp; • &nbsp;EXCEL</small><div class="brand-sub">Interactive Waves Tutor <span>•</span> Class 10 Physics</div></div></div><div class="actions header-actions"><button id="lang">Roman Urdu</button><button id="theme" aria-label="Toggle light or dark theme">☀️ / 🌙</button></div></div>
+<nav class="nav" aria-label="Main navigation"><button data-p="home" class="active">Home</button><button data-p="learn">Physics</button><button data-p="chemistry">Chemistry</button><button data-p="quiz">Quizzes</button><button data-p="lab">Animation Lab</button><button data-p="formula">Formula Sheet</button></nav><div class="progress"><i id="prog"></i></div>
+</header>
+
+<main>
+<section id="home" class="page active">
+<div class="card hero"><span class="badge">BRAINBRIDGE AI • CLASS 10</span><h2 class="wave-title">Learn smarter. <span class="asif">Explore better.</span></h2><p>Your study space for Physics and Chemistry. Choose a section below — each opens separately, without searching through a long home page.</p><p id="homeprog" class="small" style="display:none"></p><div class="stat"><div><b id="statTopics">0%</b><span>Physics Topics</span></div><div><b id="statQuiz">0%</b><span>Best Quiz</span></div><div><b>2</b><span>Subjects</span></div></div></div>
+
+<div class="bb-game-panel card">
+  <div class="bb-game-top"><div><span class="bb-kicker">YOUR LEARNING JOURNEY</span><h2>Level up your mind ✦</h2><p class="small">Study • Practice • Unlock achievements</p></div><div class="bb-level-orb"><span id="bbLevel">1</span><small>LEVEL</small></div></div>
+  <div class="bb-xp-row"><b id="bbXpText">0 / 100 XP</b><span id="bbXpTotal">✨ 0 XP total</span></div><div class="bb-xp-track"><i id="bbXpBar"></i></div>
+  <div class="bb-game-stats"><div><span>🔥</span><b id="bbStreak">0</b><small>Day streak</small></div><div><span>⚡</span><b id="bbTodayXp">0</b><small>XP today</small></div><div><span>🏆</span><b id="bbBadgeCount">0/6</b><small>Badges</small></div></div>
+  <h3 class="bb-ach-title">Achievement collection</h3><div class="bb-badges" id="bbBadges"></div>
+</div>
+<div class="home-launch-grid">
+<button class="launch-tile physics-tile" onclick="go('learn')"><span class="launch-icon">〰</span><strong>Physics</strong><small>Lessons, definitions and examples</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile chemistry-tile" onclick="go('chemistry')"><span class="launch-icon">⚗</span><strong>Chemistry</strong><small>Acid, Base & Salt • Carbon and Its Compounds</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile quiz-tile" onclick="go('quiz')"><span class="launch-icon">✓</span><strong>Quizzes</strong><small>Test your understanding and track results</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile lab-tile" onclick="go('lab')"><span class="launch-icon">◉</span><strong>Animation Lab</strong><small>Interactive Physics and Chemistry models</small><span class="launch-arrow">Open section →</span></button>
+<button class="launch-tile formula-tile" onclick="go('formula')"><span class="launch-icon">∑</span><strong>Formula Sheet</strong><small>Physics and Chemistry formulas</small><span class="launch-arrow">Open section →</span></button>
+</div>
+</section>
+
+<section id="learn" class="page"><div class="card"><div class="section-heading"><h2>📚 Physics</h2><button onclick="go('home')">← Home</button></div><p class="small">Choose a topic from the list. Use Previous / Next in the lesson to move without returning to the list.</p><p class="small">Topic select karein. Definitions, examples, misconceptions aur animations explore karein.</p><div id="topics" class="topic-list"></div></div><div id="detail" class="card"></div></section>
+
+<section id="lab" class="page"><div class="card"><div class="section-heading"><h2>⚙️ Animation Lab</h2><button onclick="go('home')">← Home</button></div><p>Simplified educational models. Play, pause, reset aur speed control use karein.</p><div class="actions"><button onclick="lab('trans')">〰 Transverse</button><button onclick="lab('long')">↔ Longitudinal</button><button onclick="lab('reflect')">↩ Reflection</button><button onclick="lab('refract')">↪ Refraction</button><button onclick="lab('diff')">◉ Diffraction</button><button onclick="lab('ripple')">🌊 Ripple Tank</button><button onclick="lab('pend')">⚖ Pendulum</button></div><h3 style="margin:18px 0 8px;color:#70f5c1">🧪 Chemistry Animations — Acid, Base and Salt</h3><p class="small">Physics animations ke neeche Chemistry ke interactive visual models.</p><div class="actions"><button onclick="lab('ph')">🧪 pH Scale</button><button onclick="lab('neutral')">⚗️ Neutralization</button><button onclick="lab('ions')">＋ Ion Formation</button><button onclick="lab('indicator')">🎨 Indicators</button><button onclick="lab('buffer')">🛡️ Buffer Solution</button></div></div><div id="labbox" class="card"></div></section>
+
+<section id="quiz" class="page"><div class="card"><div class="section-heading"><h2>🧠 Quizzes</h2><button onclick="go('home')">← Home</button></div><h3>Physics Quiz</h3><p class="small">50 improved questions • Concepts + formulas + applications.</p><div id="quizbox"></div></div><div class="card"><h2>🧪 Chemistry Quiz — Acid, Base and Salt</h2><p class="small">Class 10 Chemistry chapter practice. Restart any time to begin again.</p><div id="chemQuiz"></div></div></section>
+
+<section id="formula" class="page"><div class="card"><div class="section-heading"><h2>🧮 Formula Sheet</h2><button onclick="go('home')">← Home</button></div><h3>Formula Calculator</h3><select id="fsel" onchange="calcUI()"></select><div id="calc"></div></div><div id="sheet" class="card"></div></section>
+
+<section id="about" class="page"><div class="card"><h2>ℹ️ About & Notes</h2><p><b>Brainbridge AI</b> is an offline Class 10 Physics study tool designed to make wave concepts visual, interactive and easier to revise.</p><h3>📌 Core Notes</h3><p>Sound is mechanical; light and radio waves are electromagnetic. Refraction normally keeps frequency constant while speed and wavelength may change.</p><h3>📖 Glossary</h3><p><b>Amplitude</b> — maximum displacement.<br><b>Wavelength</b> — distance between consecutive same-phase points.<br><b>Frequency</b> — cycles per second.<br><b>Time Period</b> — time for one cycle.<br><b>Crest</b> — highest transverse point.<br><b>Trough</b> — lowest transverse point.<br><b>Compression</b> — closely packed region in a longitudinal wave.<br><b>Rarefaction</b> — spread-out region in a longitudinal wave.<br><b>Wavefront</b> — equal-phase points joined together.</p><div class="actions"><button onclick="notes()">⬇️ Download Notes</button><button onclick="window.print()">🖨️ Print Notes</button><button onclick="reset()">Reset Progress</button></div></div></section>
+<section id="chemistry" class="page">
+<div class="section-heading card"><h2>🧪 Chemistry</h2><button onclick="go('home')">← Home</button></div>
+<div class="card hero chem-hero"><span class="badge">BRAINBRIDGE AI • CLASS 10 CHEMISTRY</span><h2 class="wave-title">Acid, Base and Salt</h2><p>Sindh Textbook Board Class X Chemistry — chapter-based learning in simple English with Roman Urdu support, key definitions, examples, formulas and practice questions.</p><div class="chips"><span class="chip">14 teaching periods</span><span class="chip">2 assessment periods</span><span class="chip">15% weightage</span></div></div>
+<div class="chapter-switch"><button onclick="document.getElementById('chemDetail').scrollIntoView({behavior:'smooth',block:'start'})">Chapter 1 • Acid, Base & Salt</button><button onclick="document.getElementById('carbonDetail').scrollIntoView({behavior:'smooth',block:'start'})">Chapter 2 • Carbon</button></div>
+<div id="chemDetail" class="card lesson-card"><h2>Start with a topic</h2><p>Select a topic from the topic list.</p></div>
+<details class="topic-drawer"><summary>📘 Browse Acid, Base and Salt topics</summary><div style="padding:0 12px 10px"><input id="chemSearch" class="search" placeholder="🔎 Search topics"><div id="chemTopics" class="topic-list"></div></div></details>
+
+<div class="card hero chem-hero" style="margin-top:22px"><span class="badge">BRAINBRIDGE AI • CLASS 10 CHEMISTRY • CHAPTER 2</span><h2 class="wave-title">Carbon and Its Compounds</h2><p>Learn carbon compounds through short, easy explanations, examples, important formulas and practice questions.</p><div class="chips"><span class="chip">Organic Chemistry</span><span class="chip">Topic-wise learning</span><span class="chip">Practice quiz</span></div></div>
+<div id="carbonDetail" class="card lesson-card"><h2>Start with a topic</h2><p>Select a topic from the topic list.</p></div>
+<details class="topic-drawer"><summary>📘 Browse Carbon and Its Compounds topics</summary><div style="padding:0 12px 10px"><input id="carbonSearch" class="search" placeholder="🔎 Search topics"><div id="carbonTopics" class="topic-list"></div></div></details>
+<details class="resource-drawer"><summary>🧠 Carbon and Its Compounds — Practice Quiz</summary><p class="small">Test your understanding of this chapter. You can restart the quiz anytime.</p><div id="carbonQuiz"></div></details>
+</section>
+</main>
+<footer>🌊 <b>Brainbridge AI</b> • Learn • Visualize • Calculate • Practice</footer>
+</div>
+
+<script>
+const T=[
+["Wave kya hoti hai?","Wave ek disturbance hai jo energy transfer karti hai; medium ke particles ka net transfer zaroori nahi.","Pani ki ripple.","~ ~ ~ ~ →"],
+["Energy transfer without net transfer of matter","Wave energy aage propagate karti hai jabke particles mean position ke around oscillate karte hain.","Rope ko shake karna.","↕ particles → energy"],
+["Mechanical waves","Mechanical waves ko material medium chahiye.","Sound, water aur seismic waves.","Vacuum ✗"],
+["Electromagnetic waves","EM waves vacuum mein travel kar sakti hain.","Light aur radio waves.","Vacuum ✓"],
+["Transverse waves","Particles propagation direction ke perpendicular vibrate karte hain.","Rope wave.","↕ particles → wave"],
+["Longitudinal waves","Particles propagation direction ke parallel vibrate karte hain.","Sound wave.","↔ particles → wave"],
+["Crest and trough","Crest highest aur trough lowest point hai transverse wave mein.","Rope ya water wave.","crest / trough"],
+["Compression and rarefaction","Compression mein particles close aur rarefaction mein spread hote hain.","Sound wave.","●●●   ● ●"],
+["Amplitude","Mean position se maximum displacement ko amplitude kehte hain.","Larger amplitude sound generally greater intensity/loudness se associated hota hai.","↕ A"],
+["Wavelength","Same-phase consecutive points ka distance λ hota hai.","Crest-to-crest ya trough-to-trough.","↔ λ ↔"],
+["Frequency","Per second complete oscillations ki number f hoti hai.","5 Hz = 5 cycles/s.","f = cycles/s"],
+["Time period","Ek complete oscillation ke liye required time T hota hai.","Pendulum ka one-cycle time.","T=1/f"],
+["Wavefront","Equal phase points ko join karne wali line ya surface wavefront hoti hai.","Ripple tank mein circular wavefronts.","))))"],
+["Wave speed","Wave propagation ki speed wave speed kehlati hai.","Sound speed medium par depend karti hai.","v →"],
+["Formula v = fλ","Wave speed = frequency × wavelength.","5 Hz × 2 m = 10 m/s.","v=fλ"],
+["Reflection of waves","Boundary se wave ka bounce back hona reflection hai.","Echo ya mirror reflection.","→ wall ←"],
+["Refraction of waves","Boundary par wave speed aur generally direction change hoti hai.","Light entering glass.","air | glass"],
+["Diffraction of waves","Gap ya obstacle edge ke around waves ka spreading diffraction hai.","Sound doorway ke around spread hoti hai.","|||| ) )"],
+["Ripple tank","Water waves ko visually study karne ka model.","Straight aur circular ripples.","))))"],
+["Sound waves","Sound mechanical longitudinal wave hai aur material medium chahti hai.","Speech aur music.","●●  ●● →"],
+["Damped oscillations","Energy loss ki wajah se amplitude time ke saath decrease hoti hai.","Pendulum eventually stops.","A ↓"],
+["Simple harmonic motion","Ideal periodic motion jahan restoring acceleration/displacement relation restoring direction mein hota hai.","Mass-spring system.","← equilibrium →"],
+["Simple pendulum","Small-angle oscillations ke liye period approximately T≈2π√(L/g) hota hai.","Clock pendulum.","●\n|"],
+["Everyday applications of waves","Communication, imaging, music, medicine aur technology mein waves use hoti hain.","Radio, ultrasound, optics.","📻 🔊 🔦"]
+];
+
+let done=JSON.parse(localStorage.getItem("wl_done")||"[]"),idx=0,quizI=0,score=0,sel=-1,best=+localStorage.getItem("wl_best")||0,anim=null;
+
+function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));const page=document.getElementById(id);if(page)page.classList.add("active");document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===id));window.scrollTo({top:0,behavior:"smooth"});if(id==="learn")renderTopics();if(id==="chemistry")renderChemistry();if(id==="quiz"){renderQuiz();renderChemQuiz();}if(id==="formula"){calcUI();sheet()}}
+function progress(){const p=Math.round(done.length/T.length*100);document.getElementById("prog").style.width=p+"%";document.getElementById("homeprog").textContent=`${done.length}/${T.length} topics completed • Best quiz: ${best}%`;document.getElementById("statTopics").textContent=p+"%";document.getElementById("statQuiz").textContent=best+"%"}
+function renderTopics(filter=""){const b=document.getElementById("topics");b.innerHTML="";T.forEach((x,i)=>{if(filter&&!x[0].toLowerCase().includes(filter.toLowerCase()))return;const q=document.createElement("button");q.className=done.includes(i)?"done":"";q.textContent=(done.includes(i)?"✓ ":"")+(i+1)+". "+x[0];q.onclick=()=>openTopic(i);b.appendChild(q)});if(!b.children.length)b.innerHTML='<div class="answer">No matching topic found.</div>';openTopic(idx)}
+function openTopic(i){idx=i;const x=T[i];const map={4:"trans",5:"long",6:"trans",7:"long",8:"trans",9:"trans",15:"reflect",16:"refract",17:"diff",18:"ripple",19:"long",21:"pend",22:"pend"};const a=map[i];document.getElementById("detail").innerHTML=`<h2>${i+1}. ${x[0]}</h2><p><b>Definition:</b> ${x[1]}</p><p><b>Easy example:</b> ${x[2]}</p><div class="answer"><b>Visual idea:</b><br>${x[3].replace(/\n/g,"<br>")}</div><p><b>Important:</b> ${important(i)}</p><p><b>Common misconception:</b> ${miscon(i)}</p><div class="actions"><button class="primary" onclick="toggle(${i})">${done.includes(i)?"✓ Completed":"Mark as completed"}</button><button onclick="speak(${i})">🔊 Hear explanation</button><button onclick="ask()">🤖 Ask AI-style question</button>${a?`<button onclick="go('lab');lab('${a}')">▶️ Show animation</button>`:""}<button onclick="openTopic(${(i+1)%T.length})">Next topic →</button></div><div id="askbox"></div>`}
+function important(i){const a=["Energy is transferred by a disturbance.","Particle motion and wave propagation are distinct.","Mechanical waves need a material medium.","Electromagnetic waves can travel through vacuum.","Particle motion is perpendicular to propagation.","Particle motion is parallel to propagation.","Crest and trough describe transverse waves.","Compression and rarefaction describe longitudinal waves.","Amplitude is maximum displacement from equilibrium.","Wavelength is a distance and has SI unit metre.","Frequency has SI unit hertz.","T and f are reciprocals.","Wavefront represents equal phase.","Wave speed is propagation speed.","v=fλ is a fundamental wave relation.","Reflection involves bouncing back.","Refraction normally keeps frequency constant.","Diffraction is stronger when gap size is comparable with wavelength.","Ripple tanks model water-wave behaviour.","Sound is a mechanical wave.","Damping reduces amplitude through energy loss.","SHM is an ideal periodic model.","Pendulum formula is an approximation for small angles.","Wave applications depend on wave properties."];return a[i]||"Understand the definition, unit and physical meaning."}
+function miscon(i){const a=["Wave does not mean permanent matter transport.","Particles do not travel with the wave indefinitely.","Sound is not an electromagnetic wave.","Light does not require air.","Do not confuse particle direction with propagation direction.","Longitudinal does not mean slow.","Crest is a point/region, not wavelength.","Compression does not create extra matter.","Amplitude is not frequency.","Wavelength is a distance.","Hz is not a distance unit.","T and f are reciprocals.","Wavefront is a model of equal phase.","Particle speed and wave speed are different concepts.","Correct relation is v=fλ.","Reflection differs from refraction.","Frequency normally remains unchanged across a refracting boundary.","Diffraction is not limited to water.","Ripple tank is a model for studying wave patterns.","Sound cannot travel through vacuum.","Damping involves energy loss.","Not every periodic motion is SHM.","The pendulum expression is a small-angle approximation.","Different waves have different applications."];return a[i]||"Do not confuse related but different wave quantities."}
+function toggle(i){done.includes(i)?done=done.filter(x=>x!==i):done.push(i);localStorage.setItem("wl_done",JSON.stringify(done));progress();renderTopics(document.getElementById("search")?.value||"")}
+function speak(i){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(T[i][0]+". "+T[i][1]+". Example: "+T[i][2]))}
+function ask(){const box=document.getElementById("askbox");if(box)box.innerHTML='<div class="answer"><b>🤖 AI-style Question:</b> Is concept ko board exam mein ek daily-life example, ek diagram idea aur ek key point ke saath explain karein.</div>'}
+const globalSearch=document.getElementById("search");if(globalSearch)globalSearch.oninput=e=>{go("learn");renderTopics(e.target.value)}
+document.getElementById("theme").onclick=()=>{document.body.classList.toggle("light");localStorage.setItem("wl_theme",document.body.classList.contains("light")?"light":"dark")}
+if(localStorage.getItem("wl_theme")==="light")document.body.classList.add("light")
+document.getElementById("lang").onclick=()=>{const b=document.getElementById("lang");if(b.textContent==="Roman Urdu"){b.textContent="English";showToast("Roman Urdu mode active")}else{b.textContent="Roman Urdu";showToast("English labels restored")}}
+function quick(){go("formula");showToast("Quick revision opened")}
+
+const Q=[
+["What is a wave?",["Energy transfer by disturbance","Permanent matter transfer","Only light","A stationary object"],0,"A wave transfers energy; permanent net matter transfer is not required."],
+["Which wave requires a material medium?",["Light","Radio","Sound","Microwave"],2,"Sound is mechanical and requires a medium."],
+["Sound can travel through vacuum.",["True","False"],1,"Sound is mechanical, so it requires a material medium."],
+["SI unit of frequency is:",["m","Hz","s","m/s"],1,"Frequency is measured in hertz (Hz)."],
+["In a transverse wave, particles vibrate:",["Parallel to propagation","Perpendicular to propagation","Only forward","Not at all"],1,"Transverse particle vibration is perpendicular to propagation."],
+["In a longitudinal wave, particles vibrate:",["Perpendicular to propagation","Parallel to propagation","Only upward","In circles"],1,"Longitudinal particle vibration is parallel to propagation."],
+["Longitudinal waves contain:",["Crests only","Troughs only","Compressions and rarefactions","Only wavefronts"],2,"Compression and rarefaction are characteristic regions of longitudinal waves."],
+["Wavelength is the distance between:",["Random points","Consecutive same-phase points","Source and observer only","Two different media"],1,"For example, crest-to-crest distance is one wavelength."],
+["Which formula gives wave speed?",["v=f/λ","v=fλ","v=λ/f","v=Tλ"],1,"The wave relation is v=fλ."],
+["f=5 Hz and λ=2 m. What is v?",["5 m/s","7 m/s","10 m/s","2.5 m/s"],2,"v=fλ=5×2=10 m/s."],
+["T=0.25 s. What is f?",["0.25 Hz","2 Hz","4 Hz","8 Hz"],2,"f=1/T=1/0.25=4 Hz."],
+["Which type of wave can travel through vacuum?",["Sound","Water","Light","Seismic"],2,"Electromagnetic waves such as light can travel through vacuum."],
+["Reflection means:",["Wave disappears","Wave bounces back","Wave stops permanently","Frequency becomes zero"],1,"Reflection is the return/bounce of a wave from a boundary."],
+["During normal refraction, which quantity remains unchanged?",["Frequency","Speed","Wavelength","Direction always"],0,"Frequency normally remains constant at a boundary."],
+["Diffraction becomes especially noticeable when the gap is:",["Much larger than wavelength","Comparable to wavelength","Infinitely large","Unrelated to wavelength"],1,"Diffraction is prominent when opening size is comparable to wavelength."],
+["Ripple tanks are mainly used to study:",["Water waves","Vacuum sound","Electric current","Static charge"],0,"A ripple tank provides a visual model of water-wave behaviour."],
+["Amplitude is:",["Maximum displacement from equilibrium","Number of cycles per second","Distance travelled per second","Time for one cycle"],0,"Amplitude is maximum displacement from the mean/equilibrium position."],
+["Damping causes amplitude to:",["Increase forever","Decrease with time","Become infinite","Become wavelength"],1,"Damping represents energy loss and causes decreasing amplitude."],
+["For a small-angle simple pendulum, T is approximately:",["2π√(L/g)","L/g","fλ","1/f²"],0,"The small-angle pendulum period is approximately 2π√(L/g)."],
+["Light needs air to travel.",["True","False"],1,"Light is electromagnetic and can travel through vacuum."],
+["A wavefront joins points of:",["Equal phase","Equal mass","Equal temperature","Zero speed"],0,"A wavefront is a locus of equal-phase points."],
+["Which quantity has unit metre?",["Frequency","Wavelength","Time period","Wave speed"],1,"Wavelength is a length, so its SI unit is metre."],
+["Which quantity has unit m/s?",["Frequency","Amplitude","Wave speed","Wavelength"],2,"Wave speed is measured in metres per second."],
+["Which quantity has unit second?",["Time period","Frequency","Wavelength","Amplitude"],0,"Time period is the time for one complete cycle."],
+["If frequency increases while wave speed remains constant, wavelength:",["Increases","Decreases","Becomes zero always","Must remain unchanged"],1,"From λ=v/f, wavelength decreases when f increases at constant v."],
+["If wavelength doubles while frequency stays constant, wave speed:",["Halves","Doubles","Becomes zero","Cannot be related"],1,"v=fλ, so doubling λ doubles v if f is constant."],
+["One hertz means:",["One metre","One cycle per second","One second per cycle only","One joule"],1,"1 Hz means one complete cycle per second."],
+["If f=10 Hz, the period is:",["10 s","1 s","0.1 s","100 s"],2,"T=1/f=1/10=0.1 s."],
+["If T=2 s, frequency is:",["2 Hz","1 Hz","0.5 Hz","4 Hz"],2,"f=1/T=1/2=0.5 Hz."],
+["A crest is:",["The highest point of a transverse wave","The lowest point","A compression","A boundary"],0,"Crest is the maximum upward displacement in the chosen transverse representation."],
+["A trough is:",["The highest point","The lowest point of a transverse wave","A frequency","A source"],1,"Trough is the lowest point of the transverse wave."],
+["Amplitude is measured from:",["Crest to trough","Equilibrium to maximum displacement","One crest to next crest","Source to wall"],1,"Amplitude is measured from equilibrium/mean position to maximum displacement."],
+["Crest-to-crest distance represents:",["Amplitude","Frequency","Wavelength","Time period"],2,"Consecutive crests are one wavelength apart."],
+["Compression is a region where particles are:",["More closely packed","More widely separated","Stationary forever","Moving in vacuum"],0,"Compression is a high-density/closely packed region."],
+["Rarefaction is a region where particles are:",["More closely packed","More spread out","Converted to energy","Absent"],1,"Rarefaction is a spread-out region."],
+["A sound wave in air is generally:",["Transverse","Longitudinal","Electromagnetic","Static"],1,"Sound in air is a mechanical longitudinal wave."],
+["Which is an electromagnetic wave?",["Sound","Water wave","Light","Seismic wave"],2,"Light is electromagnetic."],
+["Which is a mechanical wave?",["Radio","Light","Sound","X-ray"],2,"Sound requires a material medium."],
+["A wave reflects when it:",["Encounters a boundary and returns","Enters vacuum","Stops oscillating","Changes into matter"],0,"Reflection involves returning from a boundary."],
+["Refraction occurs when a wave:",["Changes speed on entering another medium","Always disappears","Stops at a boundary","Loses all frequency"],0,"Refraction is associated with a change in propagation speed and often direction."],
+["In ordinary refraction, frequency:",["Normally changes","Normally remains constant","Becomes zero","Doubles automatically"],1,"Boundary conditions normally maintain frequency."],
+["When speed changes but frequency remains constant, wavelength:",["Must change","Must become zero","Cannot change","Always doubles"],0,"Since v=fλ, a speed change with constant f requires wavelength to change."],
+["Diffraction can occur around:",["Edges and through openings","Only mirrors","Only sound sources","Only vacuum"],0,"Waves can spread around edges and through openings."],
+["A narrow opening generally produces:",["More noticeable spreading","No wave","Zero wavelength","Infinite frequency"],0,"Narrow openings comparable to wavelength give stronger diffraction."],
+["Increasing amplitude generally means:",["Greater maximum displacement","Higher frequency automatically","Shorter wavelength automatically","No displacement"],0,"Amplitude describes maximum displacement."],
+["Changing amplitude does not automatically change:",["The frequency","The maximum displacement","The energy carried in many wave contexts","The oscillation size"],0,"Amplitude and frequency are different wave quantities."],
+["The relation f=1/T means frequency and period are:",["Directly proportional","Reciprocals","Always equal","Unrelated"],1,"Frequency and period are reciprocals."],
+["A wave has f=4 Hz and λ=3 m. Its speed is:",["7 m/s","12 m/s","1.33 m/s","0.75 m/s"],1,"v=fλ=4×3=12 m/s."],
+["A wave travels at 20 m/s with f=5 Hz. Its wavelength is:",["100 m","25 m","4 m","0.25 m"],2,"λ=v/f=20/5=4 m."],
+["A wave travels at 30 m/s with λ=5 m. Its frequency is:",["6 Hz","150 Hz","0.16 Hz","35 Hz"],0,"f=v/λ=30/5=6 Hz."],
+["Which statement is correct?",["Particles must travel permanently with the wave","Waves can transfer energy without net matter transport","All waves need air","All waves are transverse"],1,"The key idea is energy transfer without required net matter transport."]
+];
+
+function renderQuiz(){if(quizI>=Q.length){const pct=Math.round(score/Q.length*100);best=Math.max(best,pct);localStorage.setItem("wl_best",best);progress();document.getElementById("quizbox").innerHTML=`<div class="answer ok"><h3>🎉 Quiz Complete!</h3><p><b>Score:</b> ${score}/${Q.length}</p><p><b>Percentage:</b> ${pct}%</p><p><b>Best Score:</b> ${best}%</p></div><div class="actions"><button class="primary" onclick="restart()">🔄 Restart Quiz</button><button onclick="go('learn')">📚 Review Topics</button><button onclick="go('formula')">🧮 Practice Formulas</button></div>`;return}const q=Q[quizI];document.getElementById("quizbox").innerHTML=`<div class="progress"><i style="width:${(quizI/Q.length)*100}%"></i></div><p><b>Question ${quizI+1}/${Q.length}</b> • Score ${score}</p><h3>${q[0]}</h3>${q[1].map((o,i)=>`<button class="quizopt" onclick="pick(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join("")}<div id="exp"></div><div class="actions"><button class="primary" onclick="submitQ()">Submit Answer</button><button onclick="nextQ()" class="hidden" id="nq">Next Question →</button><button onclick="restart()">Restart</button></div>`;sel=-1}
+function pick(i){sel=i;document.querySelectorAll(".quizopt").forEach(x=>x.classList.remove("primary"));const options=document.querySelectorAll(".quizopt");if(options[i])options[i].classList.add("primary")}
+function submitQ(){if(sel<0){showToast("Pehle answer select karein.");return}const q=Q[quizI],ok=sel===q[2];if(ok)score++;document.getElementById("exp").innerHTML=`<div class="answer ${ok?"ok":"bad"}"><b>${ok?"✓ Correct":"✗ Incorrect"}</b> — ${q[3]}</div>`;document.querySelectorAll(".quizopt").forEach((x,i)=>{x.disabled=true;if(i===q[2]){x.style.borderColor="var(--green)";x.style.boxShadow="0 0 0 2px rgba(74,222,128,.12)"}if(i===sel&&i!==q[2])x.style.borderColor="var(--red)"});document.getElementById("nq").classList.remove("hidden")}
+function nextQ(){quizI++;renderQuiz()}function restart(){quizI=0;score=0;sel=-1;renderQuiz()}
+
+const FS=[
+["v=fλ","v in m/s, f in Hz, λ in m","5 Hz × 2 m = 10 m/s","Hinglish: Wave ki speed nikalne ke liye frequency ko wavelength se multiply karo."],
+["f=v/λ","f in Hz, v in m/s, λ in m","20 m/s ÷ 4 m = 5 Hz","Hinglish: Speed ko wavelength se divide karne par frequency milti hai."],
+["λ=v/f","λ in m, v in m/s, f in Hz","20 m/s ÷ 5 Hz = 4 m","Hinglish: Wave speed ko frequency se divide karo, wavelength mil jayegi."],
+["f=1/T","f in Hz, T in s","T=.25 s → 4 Hz","Hinglish: Frequency aur time period ek doosre ke reciprocal hain; 1 ko T se divide karo."],
+["T=1/f","T in s, f in Hz","f=2 Hz → .5 s","Hinglish: Ek complete cycle ka time nikalne ke liye 1 ko frequency se divide karo."],
+["T=2π√(L/g)","T in s, L in m, g in m/s²","Small-angle pendulum approximation","Hinglish: Simple pendulum ka time period length L aur gravity g par depend karta hai; yeh formula small-angle swings ke liye hai."]
+];
+const CHEM_FS=[
+["Acid + Base → Salt + Water","Neutralization reaction","HCl + NaOH → NaCl + H₂O","Hinglish: Jab acid aur base react karte hain, aam tor par salt aur water bante hain."],
+["HCl → H⁺ + Cl⁻","Hydrochloric acid in water (simplified ionic equation)","HCl(aq) → H⁺(aq) + Cl⁻(aq)","Hinglish: Arrhenius concept ke mutabiq HCl pani mein hydrogen ions (H⁺) deta hai."],
+["NaOH → Na⁺ + OH⁻","Sodium hydroxide in water (ionic equation)","NaOH(aq) → Na⁺(aq) + OH⁻(aq)","Hinglish: NaOH pani mein hydroxide ions (OH⁻) deta hai, is liye yeh Arrhenius base hai."],
+["pH = −log₁₀[H⁺]","[H⁺] is hydrogen-ion concentration in mol/L","If [H⁺] = 10⁻³ mol/L, pH = 3","Hinglish: pH hydrogen-ion concentration ko show karta hai; H⁺ zyada ho to aam tor par pH kam hota hai."],
+["pOH = −log₁₀[OH⁻]","[OH⁻] is hydroxide-ion concentration in mol/L","If [OH⁻] = 10⁻² mol/L, pOH = 2","Hinglish: pOH solution mein hydroxide ions ki concentration ko show karta hai."],
+["pH + pOH = 14","At 25°C for dilute aqueous solutions","pH = 5 → pOH = 9","Hinglish: 25°C par pH aur pOH ka sum 14 hota hai; is relation ko isi condition mein use karo."],
+["[H⁺][OH⁻] = 1.0 × 10⁻¹⁴","At 25°C in dilute aqueous solution","[H⁺] = 10⁻⁷ M → [OH⁻] = 10⁻⁷ M","Hinglish: 25°C par hydrogen aur hydroxide ion concentrations ka product 10⁻¹⁴ hota hai; neutral water mein dono barabar hote hain."],
+["NH₃ + H₂O ⇌ NH₄⁺ + OH⁻","Ammonia acts as a Brønsted–Lowry base in water","NH₃ accepts H⁺ from H₂O","Hinglish: Ammonia water se proton (H⁺) accept karta hai, aur ammonium aur hydroxide ions bante hain."],
+["HCl + H₂O → H₃O⁺ + Cl⁻","Brønsted–Lowry proton transfer example","HCl donates H⁺ to water","Hinglish: HCl proton donate karta hai aur water proton accept karke hydronium ion (H₃O⁺) banata hai."]
+];
+function sheet(){document.getElementById("sheet").innerHTML="<h2>📌 Formula Sheet</h2><h3>🌊 Physics Formulas</h3>"+FS.map(x=>`<div class="card"><div class="formula">${x[0]}</div><p>${x[1]}</p><p><b>Example:</b> ${x[2]}</p><p><b>Easy Hinglish:</b> ${x[3]}</p></div>`).join("")+"<h3>🧪 Chemistry — Acid, Base and Salt</h3><p class=\"small\">Chemistry equations aur pH relations Physics formulas ke neeche diye gaye hain.</p>"+CHEM_FS.map(x=>`<div class="card"><div class="formula">${x[0]}</div><p>${x[1]}</p><p><b>Example:</b> ${x[2]}</p><p><b>Easy Hinglish:</b> ${x[3]}</p></div>`).join("")}
+
+document.getElementById("fsel").innerHTML=["v=fλ","f=v/λ","λ=v/f","T=1/f","f=1/T","T=2π√(L/g)"].map((x,i)=>`<option value="${i}">${x}</option>`).join("");
+function calcUI(){const i=+document.getElementById("fsel").value;let html="";if(i===0)html='<input id="a" type="number" step="any" placeholder="f (Hz)"><input id="b" type="number" step="any" placeholder="λ (m)">';if(i===1)html='<input id="a" type="number" step="any" placeholder="v (m/s)"><input id="b" type="number" step="any" placeholder="λ (m)">';if(i===2)html='<input id="a" type="number" step="any" placeholder="v (m/s)"><input id="b" type="number" step="any" placeholder="f (Hz)">';if(i===3)html='<input id="a" type="number" step="any" placeholder="T (s)">';if(i===4)html='<input id="a" type="number" step="any" placeholder="f (Hz)">';if(i===5)html='<input id="a" type="number" step="any" placeholder="L (m)"><input id="b" type="number" step="any" value="9.8" placeholder="g (m/s²)">';document.getElementById("calc").innerHTML=`<div class="calc-grid">${html}</div><div class="actions" style="margin-top:10px"><button class="primary" onclick="calculate()">Calculate</button><button onclick="calcUI()">Clear</button></div><div id="cres"></div>`}
+function calculate(){const i=+document.getElementById("fsel").value,a=+document.getElementById("a").value,b=document.getElementById("b")?+document.getElementById("b").value:null;let ans,unit,sub;if(!Number.isFinite(a)||a<=0||((i===0||i===1||i===2||i===5)&&(!Number.isFinite(b)||b<=0))){document.getElementById("cres").innerHTML='<div class="answer bad">⚠️ Valid positive values enter karein.</div>';return}if(i===0){ans=a*b;unit="m/s";sub=`v = ${a} × ${b}`}if(i===1){ans=a/b;unit="Hz";sub=`f = ${a} ÷ ${b}`}if(i===2){ans=a/b;unit="m";sub=`λ = ${a} ÷ ${b}`}if(i===3){ans=1/a;unit="Hz";sub=`f = 1 ÷ ${a}`}if(i===4){ans=1/a;unit="s";sub=`T = 1 ÷ ${a}`}if(i===5){ans=2*Math.PI*Math.sqrt(a/b);unit="s";sub=`T = 2π√(${a}/${b})`}document.getElementById("cres").innerHTML=`<div class="answer ok"><b>Formula:</b> ${document.getElementById("fsel").selectedOptions[0].text}<br><b>Substitution:</b> ${sub}<br><b>Answer:</b> ${ans.toFixed(4)} ${unit}</div>`}
+
+function lab(type){if(anim)anim.play=false;const names={trans:"Transverse Wave — Crest, Trough, Amplitude & Wavelength",long:"Longitudinal Wave — Compression & Rarefaction",reflect:"Reflection of Waves",refract:"Refraction of Waves",diff:"Diffraction of Waves",ripple:"Ripple Tank",pend:"Simple Pendulum",ph:"Interactive pH Scale — Acidic, Neutral and Basic",neutral:"Acid + Base — Neutralization Reaction",ions:"Ion Formation in Water — H⁺ and OH⁻",indicator:"Acid-Base Indicators — Colour Change",buffer:"Buffer Solution — Resisting pH Change"};const descriptions={trans:"Particles move up/down while the wave propagates horizontally. Crest, trough, amplitude and wavelength are highlighted.",long:"Particles oscillate back/forth parallel to propagation. Dense regions are compressions; spread regions are rarefactions.",reflect:"Watch the incident wave reach the boundary and return as a reflected wave.",refract:"Wave speed and wavelength change between two media while frequency is represented as constant.",diff:"A wave passes through an opening and spreads into the region behind the barrier.",ripple:"Circular wavefronts expand from a source like ripples on water.",pend:"The bob oscillates about equilibrium. Formula is an approximation for small angles.",ph:"Explore how pH values move from acidic through neutral to basic. The marker animates across the scale.",neutral:"Watch hydrogen ions from an acid and hydroxide ions from a base combine to form water; remaining ions form a salt.",ions:"See a simplified view of an acid producing H⁺ ions and a base producing OH⁻ ions in water.",indicator:"A universal-indicator style colour band changes from red/orange (acidic) through green (neutral) to blue/purple (basic).",buffer:"Compare an ordinary solution with a buffer: added small acid/base pulses cause a larger pH change in the ordinary solution and a smaller change in the buffer."};document.getElementById("labbox").innerHTML=`<h2>${names[type]}</h2><p class="small">${descriptions[type]}</p><canvas id="cv" class="canvas"></canvas><div class="lab-controls"><div class="actions"><button onclick="if(anim)anim.play=true">▶ Play</button><button onclick="if(anim)anim.play=false">⏸ Pause</button><button onclick="if(anim){anim.t=0;anim.play=true}">↺ Reset</button><label>Speed <input id="spd" class="range" type="range" min=".2" max="2" step=".1" value="1"></label></div></div><p id="labtext"></p>`;anim={type:type,t:0,play:true};document.getElementById("labtext").innerHTML=type==="trans"?"Crest = maximum upward displacement • Trough = maximum downward displacement • Amplitude = equilibrium to crest • λ = crest-to-crest.":type==="long"?"Compression = particles close together • Rarefaction = particles spread apart.":type==="reflect"?"Incident wave → boundary → reflected wave ←.":type==="refract"?"Frequency normally remains constant while speed and wavelength change.":type==="diff"?"Diffraction is strongest when opening width is comparable with wavelength.":type==="ripple"?"Each expanding circle represents a simplified wavefront.":type==="ph"?"pH < 7 acidic • pH = 7 neutral • pH > 7 basic (at 25°C).":type==="neutral"?"H⁺ + OH⁻ → H₂O • Other ions form the salt. Example: HCl + NaOH → NaCl + H₂O.":type==="ions"?"Acid example: HCl → H⁺ + Cl⁻ • Base example: NaOH → Na⁺ + OH⁻.":type==="indicator"?"Indicator colours depend on pH range; never taste or touch unknown chemicals.":type==="buffer"?"A buffer resists a significant pH change when small amounts of acid or base are added.":"T≈2π√(L/g) for small-angle oscillations.";requestAnimationFrame(draw)}
+function setupCanvas(c){const d=Math.min(2,window.devicePixelRatio||1),w=c.clientWidth,h=c.clientHeight;if(c.width!==Math.floor(w*d)||c.height!==Math.floor(h*d)){c.width=Math.floor(w*d);c.height=Math.floor(h*d)}const ctx=c.getContext("2d");ctx.setTransform(d,0,0,d,0,0);return{ctx,w,h}}
+function draw(){if(!anim)return;const c=document.getElementById("cv");if(!c){anim=null;return}const {ctx,w,h}=setupCanvas(c);ctx.clearRect(0,0,w,h);drawGrid(ctx,w,h);if(anim.play){const spd=+(document.getElementById("spd")?.value||1);anim.t+=.035*spd}if(anim.type==="trans")drawTransverse(ctx,w,h);else if(anim.type==="long")drawLongitudinal(ctx,w,h);else if(anim.type==="reflect")drawReflection(ctx,w,h);else if(anim.type==="refract")drawRefraction(ctx,w,h);else if(anim.type==="diff")drawDiffraction(ctx,w,h);else if(anim.type==="ripple")drawRipple(ctx,w,h);else if(anim.type==="pend")drawPendulum(ctx,w,h);else if(anim.type==="ph")drawChemPH(ctx,w,h);else if(anim.type==="neutral")drawChemNeutral(ctx,w,h);else if(anim.type==="ions")drawChemIons(ctx,w,h);else if(anim.type==="indicator")drawChemIndicator(ctx,w,h);else if(anim.type==="buffer")drawChemBuffer(ctx,w,h);requestAnimationFrame(draw)}
+function drawGrid(ctx,w,h){ctx.save();ctx.strokeStyle="rgba(100,180,220,.07)";ctx.lineWidth=1;for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.restore()}
+function waveY(x,mid,A,L,t){return mid+A*Math.sin((x/L)*Math.PI*2-t*2.2)}
+function drawTransverse(ctx,w,h){const mid=h*.56,A=Math.min(58,h*.23),L=Math.max(110,Math.min(170,w*.23)),t=anim.t;ctx.setLineDash([6,6]);ctx.strokeStyle="rgba(255,255,255,.25)";ctx.beginPath();ctx.moveTo(10,mid);ctx.lineTo(w-10,mid);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle="#38d9ff";ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor="#38d9ff";ctx.beginPath();for(let x=0;x<=w;x++){const y=waveY(x,mid,A,L,t);if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.shadowBlur=0;for(let x=15;x<w;x+=25){const y=waveY(x,mid,A,L,t);ctx.fillStyle="#eaf7ff";ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();ctx.strokeStyle="rgba(56,217,255,.35)";ctx.beginPath();ctx.moveTo(x,mid);ctx.lineTo(x,y);ctx.stroke()}const crestX=((L/4)+(t*L/Math.PI))%L+L*.15,cy=waveY(crestX,mid,A,L,t);drawArrow(ctx,crestX,mid,crestX,cy,"#ffd166");ctx.fillStyle="#ffd166";ctx.font="bold 14px system-ui";ctx.fillText("Amplitude A",crestX+8,(mid+cy)/2);ctx.fillStyle="#fff";ctx.fillText("CREST",Math.min(w-75,crestX-20),cy-15);let troughX=crestX+L/2;if(troughX>w-20)troughX-=L;const ty=waveY(troughX,mid,A,L,t);ctx.fillStyle="#a78bfa";ctx.fillText("TROUGH",Math.min(w-80,Math.max(10,troughX-25)),ty+25);const lx=40,ly=h-48;drawArrow(ctx,lx,ly,lx+L,ly,"#4d8dff");ctx.fillStyle="#4d8dff";ctx.fillText("Wavelength λ",lx+L/2-45,ly-10);ctx.fillStyle="#a9c3d8";ctx.fillText("Equilibrium / mean position",15,mid-10);ctx.fillText("Particle motion ↕",15,25);ctx.fillText("Wave propagation →",w-160,25)}
+function drawLongitudinal(ctx,w,h){const mid=h*.55,t=anim.t,spacing=24,count=Math.ceil(w/spacing)+4;for(let i=0;i<count;i++){const base=i*spacing-20,xx=base+8*Math.sin(base/48-t*2.3);ctx.fillStyle="#eaf7ff";ctx.beginPath();ctx.arc(xx,mid,4,0,Math.PI*2);ctx.fill();ctx.strokeStyle="rgba(56,217,255,.2)";ctx.beginPath();ctx.moveTo(base,mid-18);ctx.lineTo(base,mid+18);ctx.stroke()}for(let i=0;i<4;i++){const cx=((i*170+t*45)%(w+220))-110;ctx.fillStyle="rgba(56,217,255,.09)";ctx.strokeStyle="rgba(56,217,255,.25)";ctx.beginPath();ctx.ellipse(cx,mid,34,65,0,0,Math.PI*2);ctx.fill();ctx.stroke()}ctx.fillStyle="#ffd166";ctx.font="bold 14px system-ui";ctx.fillText("COMPRESSION",15,45);ctx.fillText("COMPRESSION",w*.58,45);ctx.fillStyle="#a78bfa";ctx.fillText("RAREFACTION",w*.28,45);ctx.fillStyle="#fff";ctx.fillText("Particle vibration ↔",15,h-42);ctx.fillText("Wave propagation →",w-170,h-42);drawArrow(ctx,20,h-65,w-30,h-65,"#38d9ff")}
+function drawReflection(ctx,w,h){const wall=w*.76,mid=h*.54,t=anim.t;ctx.fillStyle="#8ba0b2";ctx.fillRect(wall,25,7,h-50);ctx.fillStyle="#ffd166";ctx.font="bold 14px system-ui";ctx.fillText("BOUNDARY",wall-35,18);for(let k=0;k<5;k++){const cycle=(t*85+k*105)%(wall-45),x=25+cycle;ctx.strokeStyle=`rgba(56,217,255,${.25+k*.12})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,mid,20+k*2,0,Math.PI*2);ctx.stroke();if(x>wall-45){const rx=wall-(x-(wall-45));ctx.strokeStyle="rgba(167,139,250,.8)";ctx.beginPath();ctx.arc(rx,mid,20+k*2,0,Math.PI*2);ctx.stroke()}}ctx.fillStyle="#38d9ff";ctx.fillText("INCIDENT →",20,45);ctx.fillStyle="#a78bfa";ctx.fillText("REFLECTED ←",wall-130,h-25)}
+function drawRefraction(ctx,w,h){const boundary=w/2;ctx.fillStyle="rgba(20,90,140,.28)";ctx.fillRect(0,0,boundary,h);ctx.fillStyle="rgba(40,130,100,.28)";ctx.fillRect(boundary,0,w-boundary,h);ctx.strokeStyle="rgba(255,255,255,.3)";ctx.beginPath();ctx.moveTo(boundary,0);ctx.lineTo(boundary,h);ctx.stroke();const t=anim.t;ctx.strokeStyle="#38d9ff";ctx.lineWidth=2;for(let x=-100;x<boundary;x+=45){const xx=x+((t*50)%45);ctx.beginPath();ctx.moveTo(xx,0);ctx.lineTo(xx,h);ctx.stroke()}ctx.strokeStyle="#ffd166";for(let x=boundary-40;x<w+80;x+=25){const xx=x+((t*30)%25);ctx.beginPath();ctx.moveTo(xx,0);ctx.lineTo(xx,h);ctx.stroke()}ctx.fillStyle="#fff";ctx.font="bold 14px system-ui";ctx.fillText("MEDIUM 1",18,28);ctx.fillText("MEDIUM 2",boundary+18,28);ctx.fillStyle="#38d9ff";ctx.fillText("longer λ",18,h-25);ctx.fillStyle="#ffd166";ctx.fillText("shorter λ",boundary+18,h-25);ctx.fillStyle="#a9c3d8";ctx.fillText("frequency normally constant",18,50)}
+function drawDiffraction(ctx,w,h){const wall=w*.55,gap=Math.min(75,h*.28),center=h/2;ctx.fillStyle="#64798b";ctx.fillRect(wall,0,9,center-gap);ctx.fillRect(wall,center+gap,9,h-center-gap);const t=anim.t;ctx.strokeStyle="#38d9ff";ctx.lineWidth=2;for(let x=15;x<wall;x+=30){const xx=x+((t*40)%30);ctx.beginPath();ctx.moveTo(xx,0);ctx.lineTo(xx,h);ctx.stroke()}for(let r=12;r<w;r+=28){ctx.strokeStyle="rgba(56,217,255,.75)";ctx.beginPath();ctx.arc(wall+5,center,r,-Math.PI/2,Math.PI/2);ctx.stroke()}ctx.fillStyle="#ffd166";ctx.font="bold 14px system-ui";ctx.fillText("NARROW GAP",wall-45,center-gap-10);ctx.fillStyle="#fff";ctx.fillText("Diffraction / spreading →",wall+25,30)}
+function drawRipple(ctx,w,h){const cx=w*.28,cy=h*.53,t=anim.t;for(let r=(t*55)%55;r<w*1.2;r+=55){const alpha=Math.max(.08,1-r/(w*1.2));ctx.strokeStyle=`rgba(56,217,255,${alpha})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke()}ctx.fillStyle="#ffd166";ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.font="bold 14px system-ui";ctx.fillText("SOURCE",cx+12,cy-12);ctx.fillText("Circular wavefronts",15,30)}
+function drawPendulum(ctx,w,h){const L=Math.min(150,h*.57),pivotX=w/2,pivotY=35,angle=.58*Math.sin(anim.t*1.7),bobX=pivotX+Math.sin(angle)*L,bobY=pivotY+Math.cos(angle)*L;ctx.strokeStyle="rgba(255,255,255,.2)";ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(pivotX,pivotY);ctx.lineTo(pivotX,pivotY+L);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle="#38d9ff";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(pivotX,pivotY);ctx.lineTo(bobX,bobY);ctx.stroke();ctx.fillStyle="#ffd166";ctx.beginPath();ctx.arc(bobX,bobY,17,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(pivotX,pivotY,5,0,Math.PI*2);ctx.fill();ctx.font="bold 14px system-ui";ctx.fillText("T≈2π√(L/g)",15,h-40);ctx.fillText("Small-angle model",15,h-18)}
+function drawArrow(ctx,x1,y1,x2,y2,color){ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();const angle=Math.atan2(y2-y1,x2-x1),size=7;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-size*Math.cos(angle-Math.PI/6),y2-size*Math.sin(angle-Math.PI/6));ctx.lineTo(x2-size*Math.cos(angle+Math.PI/6),y2-size*Math.sin(angle+Math.PI/6));ctx.closePath();ctx.fill();ctx.restore()}
+
+function notes(){let s="BRAINBRIDGE AI — CLASS 10 PHYSICS\n\n";T.forEach((x,i)=>{s+=`${i+1}. ${x[0]}\n${x[1]}\nExample: ${x[2]}\n\n`});s+="FORMULAS\nv=fλ\nf=v/λ\nλ=v/f\nf=1/T\nT=1/f\nT=2π√(L/g) for small oscillations\n";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([s],{type:"text/plain"}));a.download="brainbridge_ai_notes.txt";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function reset(){if(!confirm("Reset all Brainbridge AI progress and best quiz score?"))return;done=[];best=0;localStorage.removeItem("wl_done");localStorage.removeItem("wl_best");progress();renderTopics();showToast("Progress reset.")}
+function showToast(message){let toast=document.getElementById("toast");if(!toast){toast=document.createElement("div");toast.id="toast";toast.style.cssText=`position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(15px);background:#102d49;color:#fff;border:1px solid #38d9ff;padding:10px 15px;border-radius:12px;z-index:100;opacity:0;transition:.25s;box-shadow:0 10px 30px rgba(0,0,0,.35)`;document.body.appendChild(toast)}toast.textContent=message;toast.style.opacity="1";toast.style.transform="translateX(-50%) translateY(0)";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>{toast.style.opacity="0";toast.style.transform="translateX(-50%) translateY(15px)"},1800)}
+document.querySelectorAll("[data-p]").forEach(x=>x.onclick=()=>go(x.dataset.p));
+progress();renderTopics();sheet();calcUI();lab("trans");
+window.addEventListener("resize",()=>{});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&anim)anim.play=false;if(e.key===" "&&document.activeElement.tagName!=="INPUT"){e.preventDefault();if(anim)anim.play=!anim.play}});
+</script>
+
+<style id="brainbridge-icon-refresh">
+/* Animated vector icon system: replaces emoji pictograms without changing labels or learning content */
+.bb-icon{display:inline-block;width:1.18em;height:1.18em;vertical-align:-.22em;margin-right:.32em;flex:0 0 auto;color:var(--cyan);overflow:visible;filter:drop-shadow(0 0 5px rgba(40,226,243,.22));animation:bbIconFloat 3.4s ease-in-out infinite;}
+.bb-icon path,.bb-icon circle,.bb-icon rect,.bb-icon line,.bb-icon polyline,.bb-icon polygon{vector-effect:non-scaling-stroke}
+button .bb-icon{width:1.15em;height:1.15em;margin-right:.38em}
+h2 .bb-icon,h3 .bb-icon{width:1.25em;height:1.25em}
+.brand-mark{position:relative;overflow:hidden;animation:bbMarkGlow 4s ease-in-out infinite}
+.brand-mark:after{content:"";position:absolute;inset:-80% -35%;background:linear-gradient(110deg,transparent 42%,rgba(111,245,255,.14) 50%,transparent 58%);transform:translateX(-80%);animation:bbShimmer 6s ease-in-out infinite;pointer-events:none}
+.card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}.card:hover{border-color:rgba(40,226,243,.38);box-shadow:0 20px 48px rgba(0,0,0,.24),0 0 22px rgba(40,226,243,.035)}
+.nav button,.actions button{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease}
+.nav button:hover,.actions button:hover{transform:translateY(-2px)}
+@keyframes bbIconFloat{0%,100%{transform:translateY(0) scale(1);opacity:.94}50%{transform:translateY(-2px) scale(1.045);opacity:1}}
+@keyframes bbMarkGlow{0%,100%{box-shadow:inset 0 0 24px rgba(35,195,255,.08),0 0 18px rgba(28,201,255,.08)}50%{box-shadow:inset 0 0 28px rgba(35,195,255,.14),0 0 28px rgba(28,201,255,.19)}}
+@keyframes bbShimmer{0%,65%{transform:translateX(-80%)}85%,100%{transform:translateX(80%)}}
+@media(prefers-reduced-motion:reduce){.bb-icon,.brand-mark,.brand-mark:after{animation:none!important}.card,.nav button,.actions button{transition:none!important}}
+</style>
+
+/* Brainbridge AI — smooth logo and interface motion upgrade */
+<style id="brainbridge-smooth-motion">
+@keyframes bbLogoFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-1deg); }
+}
+@keyframes bbLogoPulse {
+  0%,100% { box-shadow: inset 0 0 24px rgba(35,195,255,.08), 0 0 18px rgba(28,201,255,.12); }
+  50% { box-shadow: inset 0 0 28px rgba(35,195,255,.16), 0 0 34px rgba(28,201,255,.28); }
+}
+@keyframes bbLogoDraw {
+  0% { stroke-dashoffset: 0; }
+  50% { stroke-dashoffset: -24; }
+  100% { stroke-dashoffset: -48; }
+}
+@keyframes bbLogoSpark {
+  0%,100% { opacity:.45; transform: scale(.96); }
+  50% { opacity:1; transform: scale(1.04); }
+}
+@keyframes bbRiseIn {
+  from { opacity:0; transform: translateY(10px); }
+  to { opacity:1; transform: translateY(0); }
+}
+.brand-mark {
+  transform-origin: center;
+  animation: bbLogoPulse 5s ease-in-out infinite;
+  transition: border-color .35s ease, box-shadow .35s ease, background .35s ease;
+}
+.brand-mark svg {
+  transform-origin: center;
+  animation: bbLogoFloat 4.8s ease-in-out infinite;
+}
+.brand-mark svg path {
+  stroke-dasharray: 120;
+  animation: bbLogoDraw 9s ease-in-out infinite;
+}
+.brand-mark svg path:nth-of-type(2) { animation-delay: -.8s; }
+.brand-mark svg path:nth-of-type(3) { animation-delay: -1.6s; }
+.brand-lockup h1 { transition: letter-spacing .35s ease, filter .35s ease; }
+.brand-lockup:hover .brand-mark { border-color: rgba(66,233,239,.75); }
+.brand-lockup:hover h1 { letter-spacing: -.025em; filter: drop-shadow(0 0 12px rgba(66,233,239,.2)); }
+.brand-mark:before {
+  content:"";
+  position:absolute;
+  width:7px;height:7px;border-radius:50%;
+  right:8px;top:8px;
+  background:#65f4ff;
+  box-shadow:0 0 10px #65f4ff, 0 0 20px rgba(65,230,255,.65);
+  animation:bbLogoSpark 3s ease-in-out infinite;
+  pointer-events:none;
+}
+.card, .hero, .nav button, .actions button, .topic-list button {
+  transition: transform .28s cubic-bezier(.2,.75,.25,1), box-shadow .3s ease, border-color .3s ease, background .3s ease;
+}
+.page.active { animation: bbRiseIn .38s ease both; }
+.card:hover { box-shadow: 0 12px 32px rgba(0,170,255,.075); }
+.nav button:hover, .actions button:hover, .topic-list button:hover { transform: translateY(-2px); }
+button:active { transform: scale(.985); }
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark, .brand-mark svg, .brand-mark svg path, .brand-mark:before, .page.active {
+    animation:none!important;
+  }
+  .card, .hero, .nav button, .actions button, .topic-list button, .brand-lockup h1 {
+    transition:none!important;
+  }
+}
+</style>
+
+<script id="brainbridge-animated-icons">
+(()=>{
+ const paths={
+  book:'<path d="M4 5.5c4-2 8-1.4 12 1v13c-4-2.4-8-3-12-1z"/><path d="M20 5.5c-4-2-8-1.4-12 1v13c4-2.4 8-3 12-1z"/><path d="M12 6.5v13"/>',
+  settings:'<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.55v-.1a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 0 0 8.1 15a1.7 1.7 0 0 0-1.56-1.03H6v-2.55h.1A1.7 1.7 0 0 0 7.66 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.8-1.8.06.06A1.7 1.7 0 0 0 11 6.66 1.7 1.7 0 0 0 12.03 5.1V5h2.55v.1A1.7 1.7 0 0 0 15.6 6.66a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0 0 18.94 10 1.7 1.7 0 0 0 20.5 11.03h.1v2.55h-.1A1.7 1.7 0 0 0 19.4 15z"/>',
+  brain:'<path d="M12 4.5a3 3 0 0 0-5.8 1.1A3.6 3.6 0 0 0 4.8 12a3.4 3.4 0 0 0 2.4 5.8A3 3 0 0 0 12 19z"/><path d="M12 4.5a3 3 0 0 1 5.8 1.1A3.6 3.6 0 0 1 19.2 12a3.4 3.4 0 0 1-2.4 5.8A3 3 0 0 1 12 19z"/><path d="M8 8l2 2-2 2m8-4-2 2 2 2M12 4v15"/>',
+  bolt:'<path d="M13.2 2.5 5.8 13h5l-.8 8.5L18.2 11h-5z"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.7"/>',
+  spark:'<path d="m12 2 1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/>',
+  save:'<path d="M5 3h12l3 3v15H4V3z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/>',
+  calc:'<rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 6h8v4H8zM8 14h1m3 0h1m3 0h1M8 18h1m3 0h1m3 0h1"/>',
+  wave:'<path d="M2 12h3l3-7 4 14 4-14 3 7h3"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>',
+  pin:'<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0z"/><circle cx="12" cy="10" r="2.2"/>',
+  download:'<path d="M12 3v12m-5-5 5 5 5-5"/><path d="M4 17v3h16v-3"/>',
+  printer:'<path d="M6 8V3h12v5M6 17H4V9h16v8h-2"/><path d="M7 14h10v7H7zM17 11h.01"/>',
+  volume:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12"/>',
+  robot:'<rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M9 12h.01M15 12h.01M8 16h8M2 12h2m16 0h2"/>',
+  play:'<path d="M7 4.5 19 12 7 19.5z"/>',
+  redo:'<path d="M20 7v6h-6M19 13a7 7 0 1 1-2-6"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.7 8.7 0 1 0 20.5 14z"/>',
+  trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H3v2a4 4 0 0 0 4 4m10-6h4v2a4 4 0 0 1-4 4M12 14v4m-4 3h8m-7-3h6"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  waves:'<path d="M2 8c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3M2 16c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3"/>',
+  home:'<path d="m3 11 9-8 9 8M5.5 9v11h13V9M9 20v-6h6v6"/>',
+  bookcheck:'<path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M7 4v13a3 3 0 0 0 3 3M9 9l2 2 4-4"/>'
+ };
+ const rules=[
+  [/📚|📖/gu,'book'],[/⚙️|⚙/gu,'settings'],[/🧠/gu,'brain'],[/⚡/gu,'bolt'],[/🎯/gu,'target'],[/✨|💫|💡/gu,'spark'],[/💾/gu,'save'],[/🧮/gu,'calc'],[/🌊|〰/gu,'waves'],[/ℹ️|ℹ/gu,'info'],[/📌/gu,'pin'],[/⬇️|⬇/gu,'download'],[/🖨️|🖨/gu,'printer'],[/🔊/gu,'volume'],[/🤖/gu,'robot'],[/▶️|▶/gu,'play'],[/🔄|↻/gu,'redo'],[/🔎|🔍/gu,'search'],[/☀️|☀/gu,'sun'],[/🌙/gu,'moon'],[/🏆|🎉/gu,'trophy'],[/🌐/gu,'globe'],[/🏠/gu,'home'],[/📝|📋/gu,'bookcheck'],[/⏸/gu,'settings'],[/↩|↪|↔/gu,'wave'],[/⚖/gu,'target'],[/◉/gu,'target'],[/🔔/gu,'spark'],[/🔁/gu,'redo']
+ ];
+ function icon(name){return `<svg class="bb-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${paths[name]||paths.spark}</svg>`}
+ function convert(root){
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){if(!n.nodeValue||!n.nodeValue.trim())return NodeFilter.FILTER_REJECT;const p=n.parentElement;if(!p||p.closest('script,style,svg,textarea,input,select,option'))return NodeFilter.FILTER_REJECT;return rules.some(([re])=>{re.lastIndex=0;return re.test(n.nodeValue)})?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const n of nodes){let value=n.nodeValue;const frag=document.createDocumentFragment();let last=0;const all=[];for(const [re,name] of rules){re.lastIndex=0;let m;while((m=re.exec(value))!==null)all.push({start:m.index,end:m.index+m[0].length,name});}all.sort((a,b)=>a.start-b.start);let cursor=0;for(const x of all){if(x.start<cursor)continue;frag.append(document.createTextNode(value.slice(cursor,x.start)));const holder=document.createElement('span');holder.innerHTML=icon(x.name);frag.append(holder.firstElementChild);cursor=x.end;}frag.append(document.createTextNode(value.slice(cursor)));n.parentNode.replaceChild(frag,n);}
+ }
+ function safeConvert(root){try{convert(root)}catch(e){}}
+ document.addEventListener('DOMContentLoaded',()=>{safeConvert(document.body);const observer=new MutationObserver(records=>{for(const r of records){for(const node of r.addedNodes){if(node.nodeType===Node.TEXT_NODE){const parent=node.parentElement;if(parent)safeConvert(parent)}else if(node.nodeType===Node.ELEMENT_NODE&&!node.matches('svg,script,style'))safeConvert(node)}}});observer.observe(document.body,{childList:true,subtree:true});});
+})();
+</script>
+
+
+<script id="bb-wave-pro-renderers">
+/* Visual-only upgrade: retains the same wave concepts, controls, labels and learning text. */
+function bbGlowLine(ctx, draw, color, width=3, blur=16){
+  ctx.save();ctx.beginPath();draw();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap="round";ctx.lineJoin="round";ctx.shadowColor=color;ctx.shadowBlur=blur;ctx.stroke();ctx.restore();
+}
+function bbPill(ctx,text,x,y,color){
+  ctx.save();ctx.font="600 12px system-ui";const pad=9,w=ctx.measureText(text).width+pad*2;
+  ctx.fillStyle="rgba(3,17,39,.82)";ctx.strokeStyle=color+"88";ctx.lineWidth=1;
+  ctx.beginPath();ctx.roundRect(x,y-16,w,25,9);ctx.fill();ctx.stroke();
+  ctx.fillStyle=color;ctx.fillText(text,x+pad,y+1);ctx.restore();
+}
+function drawTransverse(ctx,w,h){
+  const mid=h*.52,A=Math.min(58,h*.22),L=Math.max(110,Math.min(170,w*.23)),t=anim.t;
+  // Subtle scientific grid and luminous equilibrium line
+  ctx.save();ctx.strokeStyle="rgba(82,174,255,.075)";ctx.lineWidth=1;
+  for(let x=0;x<w;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(let y=0;y<h;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+  ctx.setLineDash([5,7]);ctx.strokeStyle="rgba(160,205,255,.38)";ctx.beginPath();ctx.moveTo(12,mid);ctx.lineTo(w-12,mid);ctx.stroke();ctx.setLineDash([]);
+  // Soft underglow and main wave
+  const wave=()=>{for(let x=0;x<=w;x++){const y=waveY(x,mid,A,L,t);if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}};
+  bbGlowLine(ctx,wave,"rgba(19,134,255,.48)",9,24);
+  bbGlowLine(ctx,wave,"#31e6ff",3.4,17);
+  // Animated luminous particles travelling with the wave
+  for(let x=12;x<w;x+=22){
+    const y=waveY(x,mid,A,L,t);
+    const g=ctx.createRadialGradient(x,y,0,x,y,9);g.addColorStop(0,"rgba(230,255,255,.98)");g.addColorStop(.35,"rgba(50,232,255,.8)");g.addColorStop(1,"rgba(50,232,255,0)");
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#e8fcff";ctx.beginPath();ctx.arc(x,y,2.1,0,Math.PI*2);ctx.fill();
+  }
+  const crestX=((L/4+t*L/Math.PI)%L)+L*.15,cy=waveY(crestX,mid,A,L,t);
+  ctx.setLineDash([4,5]);ctx.strokeStyle="rgba(255,209,102,.72)";ctx.beginPath();ctx.moveTo(crestX,mid);ctx.lineTo(crestX,cy);ctx.stroke();ctx.setLineDash([]);
+  drawArrow(ctx,crestX,mid,crestX,cy,"#ffd166");
+  bbPill(ctx,"AMPLITUDE A",Math.min(w-118,crestX+12),(mid+cy)/2,"#ffd166");
+  bbPill(ctx,"CREST",Math.min(w-84,Math.max(8,crestX-22)),cy-13,"#71f4ff");
+  let troughX=crestX+L/2;if(troughX>w-20)troughX-=L;const ty=waveY(troughX,mid,A,L,t);
+  bbPill(ctx,"TROUGH",Math.min(w-100,Math.max(8,troughX-24)),ty+28,"#b8a0ff");
+  const ly=h-42;drawArrow(ctx,Math.max(20,w*.16),ly,Math.min(w-20,w*.16+L),ly,"#6ba8ff");
+  bbPill(ctx,"WAVELENGTH  λ",Math.max(10,w*.16+L/2-55),ly-12,"#8abaff");
+  ctx.fillStyle="rgba(208,232,255,.72)";ctx.font="11px system-ui";ctx.fillText("EQUILIBRIUM",14,mid-9);
+  bbPill(ctx,"PARTICLE MOTION  ↕",14,25,"#7cf4ff");
+  bbPill(ctx,"ENERGY / WAVE DIRECTION  →",Math.max(20,w-214),25,"#7daeff");
+  ctx.restore();
+}
+function drawLongitudinal(ctx,w,h){
+  const mid=h*.53,t=anim.t,spacing=22,count=Math.ceil(w/spacing)+5;
+  ctx.save();
+  // Depth grid
+  ctx.strokeStyle="rgba(82,174,255,.07)";ctx.lineWidth=1;
+  for(let x=0;x<w;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(let y=0;y<h;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+  // Wave travel line
+  ctx.setLineDash([5,7]);ctx.strokeStyle="rgba(140,205,255,.3)";ctx.beginPath();ctx.moveTo(10,mid);ctx.lineTo(w-10,mid);ctx.stroke();ctx.setLineDash([]);
+  // Particle locations oscillate parallel to propagation; density creates visible compression bands.
+  for(let i=0;i<count;i++){
+    const base=i*spacing-18;
+    const xx=base+8.5*Math.sin(base/43-t*2.25);
+    const pulse=(Math.cos(base/43-t*2.25)+1)/2;
+    const radius=3.2+1.3*pulse;
+    const glow=ctx.createRadialGradient(xx,mid,0,xx,mid,12);
+    glow.addColorStop(0,`rgba(87,241,255,${.68+.25*pulse})`);glow.addColorStop(1,"rgba(30,150,255,0)");
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(xx,mid,12,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=pulse>.65?"#eaffff":"#6edfff";ctx.beginPath();ctx.arc(xx,mid,radius,0,Math.PI*2);ctx.fill();
+  }
+  // Soft moving compression / rarefaction zones
+  for(let i=0;i<4;i++){
+    const cx=((i*170+t*43)%(w+220))-110;
+    const g=ctx.createLinearGradient(cx-55,0,cx+55,0);
+    g.addColorStop(0,"rgba(55,212,255,0)");g.addColorStop(.5,"rgba(55,212,255,.13)");g.addColorStop(1,"rgba(55,212,255,0)");
+    ctx.fillStyle=g;ctx.fillRect(cx-55,mid-62,110,124);
+    ctx.strokeStyle="rgba(80,220,255,.25)";ctx.beginPath();ctx.moveTo(cx,mid-55);ctx.lineTo(cx,mid+55);ctx.stroke();
+  }
+  bbPill(ctx,"COMPRESSION · HIGH DENSITY",14,35,"#70f3ff");
+  bbPill(ctx,"RAREFACTION · LOW DENSITY",Math.max(14,w*.51),35,"#c0a7ff");
+  drawArrow(ctx,20,h-58,w-28,h-58,"#38d9ff");
+  bbPill(ctx,"PARTICLE VIBRATION  ↔",14,h-20,"#7cf4ff");
+  bbPill(ctx,"WAVE PROPAGATION  →",Math.max(20,w-190),h-20,"#8abaff");
+  ctx.restore();
+}
+</script>
+
+<script id="bb-optics-pendulum-renderers">
+/* Visual renderer upgrade only: lesson copy, controls and animation selection stay untouched. */
+function bbTag(ctx, text, x, y, color){
+  ctx.save();ctx.font="600 11px system-ui";const width=ctx.measureText(text).width+18;
+  ctx.fillStyle="rgba(3,15,35,.88)";ctx.strokeStyle=color+"88";ctx.lineWidth=1;
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x,y-16,width,25,8);ctx.fill();ctx.stroke();}
+  else {ctx.fillRect(x,y-16,width,25);ctx.strokeRect(x,y-16,width,25);}
+  ctx.fillStyle=color;ctx.fillText(text,x+9,y+1);ctx.restore();
+}
+function bbGlow(ctx, fn, color, width=2.5, blur=12){
+  ctx.save();ctx.beginPath();fn();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap="round";ctx.lineJoin="round";ctx.shadowColor=color;ctx.shadowBlur=blur;ctx.stroke();ctx.restore();
+}
+function bbArrow(ctx,x1,y1,x2,y2,color){
+  ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1),n=8;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-n*Math.cos(a-.48),y2-n*Math.sin(a-.48));ctx.lineTo(x2-n*Math.cos(a+.48),y2-n*Math.sin(a+.48));ctx.closePath();ctx.fill();ctx.restore();
+}
+function bbGrid(ctx,w,h){
+  ctx.save();ctx.strokeStyle="rgba(91,181,255,.075)";ctx.lineWidth=1;
+  for(let x=0;x<w;x+=25){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(let y=0;y<h;y+=25){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+  ctx.restore();
+}
+drawReflection = function(ctx,w,h){
+  const wall=w*.72,mid=h*.52,t=anim.t;
+  bbGrid(ctx,w,h);
+  const grad=ctx.createLinearGradient(0,0,w,0);grad.addColorStop(0,"rgba(33,202,255,.08)");grad.addColorStop(.7,"rgba(45,120,255,.02)");grad.addColorStop(1,"rgba(179,126,255,.08)");
+  ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+  bbGlow(ctx,()=>{ctx.moveTo(wall,20);ctx.lineTo(wall,h-20)},"#9bb9d2",3,10);
+  bbTag(ctx,"REFLECTING SURFACE",Math.max(8,wall-72),20,"#b9d9ff");
+  // Incoming ray
+  bbGlow(ctx,()=>{ctx.moveTo(22,mid+70);ctx.lineTo(wall-3,mid)},"#31e6ff",3,16);
+  bbGlow(ctx,()=>{ctx.moveTo(wall-3,mid);ctx.lineTo(22,mid-70)},"#b49aff",3,16);
+  // Animated wavefront arcs approaching and returning from boundary
+  for(let k=0;k<5;k++){
+    const r=((t*48+k*43)%(wall*.76))+8;
+    ctx.save();ctx.globalAlpha=.76-k*.1;
+    bbGlow(ctx,()=>{ctx.arc(22,mid+70,r,-.9,.05)},"#31dfff",1.8,8);
+    const rr=((t*48+k*43)%(wall*.6))+8;
+    bbGlow(ctx,()=>{ctx.arc(wall-3,mid,rr,Math.PI*.65,Math.PI*1.35)},"#b49aff",1.8,9);
+    ctx.restore();
+  }
+  ctx.save();ctx.strokeStyle="rgba(255,255,255,.32)";ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(wall,mid-100);ctx.lineTo(wall,mid+100);ctx.stroke();ctx.restore();
+  bbTag(ctx,"INCIDENT WAVE",18,h-25,"#5beaff");bbTag(ctx,"REFLECTED WAVE",Math.max(20,wall-140),h-25,"#c5adff");
+  bbArrow(ctx,wall+12,mid-3,w-18,mid-3,"#a8c5ff");
+};
+drawRefraction = function(ctx,w,h){
+  const b=w*.5,t=anim.t;
+  bbGrid(ctx,w,h);
+  const g1=ctx.createLinearGradient(0,0,b,h);g1.addColorStop(0,"rgba(22,177,255,.18)");g1.addColorStop(1,"rgba(14,70,143,.12)");
+  const g2=ctx.createLinearGradient(b,0,w,h);g2.addColorStop(0,"rgba(149,104,255,.18)");g2.addColorStop(1,"rgba(32,177,190,.12)");
+  ctx.fillStyle=g1;ctx.fillRect(0,0,b,h);ctx.fillStyle=g2;ctx.fillRect(b,0,w-b,h);
+  bbGlow(ctx,()=>{ctx.moveTo(b,8);ctx.lineTo(b,h-8)},"#d7e9ff",2,12);
+  // Normal line
+  ctx.save();ctx.strokeStyle="rgba(255,255,255,.42)";ctx.setLineDash([5,6]);ctx.beginPath();ctx.moveTo(b,12);ctx.lineTo(b,h-12);ctx.stroke();ctx.restore();
+  const y0=h*.19,y1=h*.8,x0=b*.48,x2=b+(w-b)*.67;
+  bbGlow(ctx,()=>{ctx.moveTo(12,y0);ctx.lineTo(b,y1*.57)},"#31e6ff",3,15);
+  bbGlow(ctx,()=>{ctx.moveTo(b,y1*.57);ctx.lineTo(x2,h*.38)},"#ffce72",3,15);
+  // Moving wavefronts: tighter spacing in second medium
+  for(let i=0;i<5;i++){
+    const y=((t*38+i*48)%(h+45))-20;
+    bbGlow(ctx,()=>{ctx.moveTo(10,y);ctx.lineTo(b,y+22)},"#31dfff",1.5,6);
+  }
+  for(let i=0;i<7;i++){
+    const y=((t*28+i*29)%(h+30))-15;
+    bbGlow(ctx,()=>{ctx.moveTo(b+3,y);ctx.lineTo(w-8,y+10)},"#ffcf78",1.5,6);
+  }
+  bbTag(ctx,"MEDIUM 1 · FASTER",12,25,"#68efff");
+  bbTag(ctx,"MEDIUM 2 · SLOWER",Math.min(w-160,b+12),25,"#d0b4ff");
+  bbTag(ctx,"DIRECTION CHANGES",Math.max(10,b-70),h-18,"#ffe09a");
+};
+drawDiffraction = function(ctx,w,h){
+  const wall=w*.46,gap=Math.min(70,h*.28),cy=h*.53,t=anim.t;
+  bbGrid(ctx,w,h);
+  // Wall and narrow slit
+  const metal=ctx.createLinearGradient(wall-7,0,wall+8,0);metal.addColorStop(0,"#4e7598");metal.addColorStop(.5,"#b5d6ec");metal.addColorStop(1,"#456583");
+  ctx.fillStyle=metal;ctx.fillRect(wall-5,0,10,cy-gap);ctx.fillRect(wall-5,cy+gap,10,h-cy-gap);
+  // Incoming parallel wavefronts
+  for(let i=0;i<7;i++){
+    const x=18+((t*45+i*35)%(wall-10));
+    bbGlow(ctx,()=>{ctx.moveTo(x,12);ctx.lineTo(x,h-12)},"#31e6ff",1.8,8);
+  }
+  // Semi-circular spreading wavefronts from slit
+  for(let i=0;i<8;i++){
+    const r=((t*42+i*24)%(w*.86))+6;
+    ctx.save();ctx.globalAlpha=Math.max(.18,1-r/(w*1.15));
+    bbGlow(ctx,()=>{ctx.arc(wall+3,cy,r,-Math.PI/2,Math.PI/2)},"#4fe8ff",2,11);
+    ctx.restore();
+  }
+  bbTag(ctx,"PLANE WAVES",12,24,"#6cf0ff");
+  bbTag(ctx,"NARROW SLIT",Math.max(8,wall-46),cy-gap-10,"#ffe09a");
+  bbTag(ctx,"WAVE SPREADING",Math.min(w-145,wall+30),28,"#8ddcff");
+  bbArrow(ctx,wall+18,h-24,w-16,h-24,"#70dfff");
+};
+drawRipple = function(ctx,w,h){
+  const cx=w*.29,cy=h*.48,t=anim.t;
+  bbGrid(ctx,w,h);
+  // Tank glass frame and water surface
+  ctx.save();ctx.strokeStyle="rgba(99,213,255,.52)";ctx.lineWidth=2;
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(10,12,w-20,h-24,16);ctx.stroke()}else ctx.strokeRect(10,12,w-20,h-24);
+  const water=ctx.createLinearGradient(0,0,0,h);water.addColorStop(0,"rgba(26,173,255,.12)");water.addColorStop(1,"rgba(24,76,190,.06)");
+  ctx.fillStyle=water;ctx.fillRect(12,14,w-24,h-28);ctx.restore();
+  // Concentric ripples with fading neon glow
+  for(let i=0;i<9;i++){
+    const r=((t*38+i*23)%(w*.68))+3,alpha=Math.max(.08,1-r/(w*.9));
+    ctx.save();ctx.globalAlpha=alpha;
+    bbGlow(ctx,()=>{ctx.arc(cx,cy,r,0,Math.PI*2)},"#31e6ff",2,13);
+    ctx.restore();
+  }
+  const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,24);glow.addColorStop(0,"#ffffff");glow.addColorStop(.22,"#72f4ff");glow.addColorStop(1,"rgba(48,219,255,0)");
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(cx,cy,24,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#eaffff";ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fill();
+  bbTag(ctx,"RIPPLE TANK",20,32,"#70f4ff");
+  bbTag(ctx,"CIRCULAR WAVEFRONTS",Math.min(w-190,cx+35),h-22,"#8ccfff");
+  // Tiny floating reflection sparkles
+  for(let i=0;i<14;i++){
+    const x=(i*71+t*11)%w,y=25+(i*37)%(h-50);
+    ctx.fillStyle=`rgba(190,248,255,${.18+.22*(Math.sin(t+i)+1)/2})`;ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fill();
+  }
+};
+drawPendulum = function(ctx,w,h){
+  const L=Math.min(150,h*.55),px=w*.5,py=34,angle=.58*Math.sin(anim.t*1.7),bx=px+Math.sin(angle)*L,by=py+Math.cos(angle)*L;
+  bbGrid(ctx,w,h);
+  // Swing arc and center equilibrium
+  ctx.save();ctx.setLineDash([5,6]);ctx.strokeStyle="rgba(180,213,255,.42)";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(px,py,L,Math.PI*.18,Math.PI*.82);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py+L+20);ctx.stroke();ctx.restore();
+  // Faint extreme-position guides
+  for(const a of [-.58,.58]){
+    const ex=px+Math.sin(a)*L,ey=py+Math.cos(a)*L;
+    ctx.save();ctx.setLineDash([3,6]);ctx.strokeStyle="rgba(180,145,255,.35)";ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex,py);ctx.stroke();ctx.restore();
+    ctx.fillStyle="rgba(183,155,255,.65)";ctx.beginPath();ctx.arc(ex,ey,4,0,Math.PI*2);ctx.fill();
+  }
+  // String with luminous core
+  bbGlow(ctx,()=>{ctx.moveTo(px,py);ctx.lineTo(bx,by)},"#8deeff",2.5,8);
+  // Pendulum bob with metallic gradient
+  const rg=ctx.createRadialGradient(bx-6,by-7,2,bx,by,20);rg.addColorStop(0,"#ffffff");rg.addColorStop(.25,"#8cf6ff");rg.addColorStop(.68,"#20bfe8");rg.addColorStop(1,"#1753b7");
+  ctx.save();ctx.shadowColor="#27dfff";ctx.shadowBlur=24;ctx.fillStyle=rg;ctx.beginPath();ctx.arc(bx,by,17,0,Math.PI*2);ctx.fill();ctx.restore();
+  ctx.fillStyle="#eaffff";ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill();
+  // Direction marker and motion trail
+  bbArrow(ctx,bx,by,bx+Math.cos(angle)*25,by-Math.sin(angle)*25,"#ffcf72");
+  bbTag(ctx,"PENDULUM",14,25,"#72efff");
+  bbTag(ctx,"T ≈ 2π√(L/g)",14,h-18,"#ffd17b");
+  bbTag(ctx,"OSCILLATION",Math.max(12,w-120),h-18,"#c3adff");
+};
+</script>
+
+
+<script id="bb-chemistry-logic">
+// Added chapter module. It does not replace or modify the existing Physics topic/quiz data.
+const CHEM_TOPICS = [
+ {title:"1. Acids, Bases and Salts — Introduction",def:"This chapter studies acids, bases and salts, how they behave, and how their acidic or basic nature can be described.",example:"Lemon juice is commonly acidic; soap solution is commonly basic.",key:"The chapter is listed in the uploaded Class X Sindh Textbook Board Chemistry book with 14 teaching periods, 2 assessment periods and 15% weightage.",remember:"A familiar taste or touch is not a safe or reliable chemical test. Never taste or touch unknown laboratory chemicals."},
+ {title:"2. Arrhenius Concept of Acids and Bases",def:"In the Arrhenius concept, an acid produces hydrogen ions (H⁺) when dissolved in water, while a base produces hydroxide ions (OH⁻) in water.",example:"HCl(aq) → H⁺(aq) + Cl⁻(aq); NaOH(aq) → Na⁺(aq) + OH⁻(aq).",key:"This definition focuses on aqueous solutions.",remember:"An acid is not defined simply as a substance that contains hydrogen; the concept describes the ions it produces in water."},
+ {title:"3. Brønsted–Lowry Acid and Base",def:"A Brønsted–Lowry acid donates a proton (H⁺). A Brønsted–Lowry base accepts a proton (H⁺).",example:"In HCl + H₂O → H₃O⁺ + Cl⁻, HCl donates a proton and water accepts it.",key:"Acid = proton donor; base = proton acceptor.",remember:"A proton here means H⁺, not a whole hydrogen atom."},
+ {title:"4. Lewis Acid and Base",def:"A Lewis acid accepts a pair of electrons to form a coordinate covalent bond. A Lewis base donates a pair of electrons.",example:"NH₃ can donate a lone pair to BF₃ to form H₃N→BF₃.",key:"The uploaded book includes the NH₃ and BF₃ example.",remember:"Lewis acid/base language is about electron-pair acceptance or donation, not necessarily about H⁺."},
+ {title:"5. Strong and Weak Acids and Bases",def:"Strength describes the extent to which an acid or base ionizes in water. Strong acids/bases ionize to a large extent; weak acids/bases ionize only partially.",example:"Hydrochloric acid is commonly used as an example of a strong acid; ethanoic acid is a weak acid.",key:"Strength is different from concentration: a dilute solution can contain a strong acid.",remember:"Do not use ‘strong’ and ‘concentrated’ as if they mean the same thing."},
+ {title:"6. Indicators and pH",def:"An indicator changes colour over a pH range and helps show whether a solution is acidic or basic. pH expresses how acidic or basic an aqueous solution is.",example:"Blue litmus turns red in an acidic solution; red litmus turns blue in a basic solution.",key:"At 25°C, pH 7 is neutral; pH below 7 is acidic; pH above 7 is basic.",remember:"Indicators help identify a range or character; they do not all give an exact pH value."},
+ {title:"7. pH, pOH and Their Relationship",def:"pH and pOH are numerical measures related to hydrogen-ion and hydroxide-ion levels in aqueous solutions.",example:"The textbook note gives: pH + pOH = 14 (at 25°C). If pH = 5, pOH = 9.",key:"pH + pOH = 14 at 25°C.",remember:"The sum-of-14 relationship assumes the usual school-level condition of 25°C."},
+ {title:"8. Neutralization Reaction",def:"Neutralization is the reaction of an acid with a base to form salt and water in a typical acid–base reaction.",example:"HCl + NaOH → NaCl + H₂O.",key:"Acid + Base → Salt + Water (for a typical strong acid–strong base reaction).",remember:"The products depend on which acid and base react; use balanced chemical equations."},
+ {title:"9. Salts and Their Formation",def:"A salt is an ionic compound that can be formed when the replaceable hydrogen of an acid is replaced by a metal or ammonium ion; salts are commonly produced in acid–base reactions.",example:"Hydrochloric acid reacting with sodium hydroxide forms sodium chloride and water.",key:"Learn the salt name and formula from the acid and base used.",remember:"Not every salt solution is neutral; some salts make acidic or basic solutions."},
+ {title:"10. Amphoteric Substances",def:"An amphoteric substance can react with both acids and bases.",example:"The textbook review section asks about substances that react with both acids and bases.",key:"Amphoteric means able to show both acidic and basic behaviour, depending on the reactant.",remember:"Amphoteric does not mean that a substance is always neutral."},
+ {title:"11. Buffer Solutions",def:"A buffer is an aqueous solution that resists a significant change in pH when small amounts of acid or base are added. It commonly contains a weak acid and its conjugate base, or a weak base and its conjugate acid.",example:"The book explains that adding a small amount of acid or base to a buffer does not change its pH significantly.",key:"A buffer resists pH change; it does not prevent every possible pH change.",remember:"A buffer has limited capacity and cannot neutralize unlimited added acid or base."},
+ {title:"12. Safety and Everyday Applications",def:"Acids and bases are used in daily life and industry, but some are corrosive and can damage skin, eyes or materials.",example:"Use only teacher-approved, labelled materials during school demonstrations.",key:"Follow laboratory instructions and wear appropriate protective equipment.",remember:"Never mix unknown chemicals or taste laboratory substances."}
+];
+const CHEM_Q=[
+ ["According to the Arrhenius concept, an acid in water produces:",["Hydrogen ions (H⁺)","Only electrons","Only oxygen gas","Metal atoms"],0,"Arrhenius acids produce H⁺ in aqueous solution."],
+ ["A Brønsted–Lowry base is a proton:",["Donor","Acceptor","Neutron","Source of electrons only"],1,"A Brønsted–Lowry base accepts H⁺."],
+ ["A Lewis acid:",["Donates an electron pair","Accepts an electron pair","Always produces OH⁻","Is always a salt"],1,"A Lewis acid accepts an electron pair."],
+ ["At 25°C, a solution with pH 3 is:",["Acidic","Neutral","Basic","A pure metal"],0,"pH below 7 is acidic at 25°C."],
+ ["According to the textbook note, pH + pOH equals:",["7","10","14","100"],2,"At 25°C, pH + pOH = 14."],
+ ["A typical acid-base neutralization forms:",["Salt and water","Only oxygen","Only carbon","A metal and hydrogen"],0,"A typical neutralization reaction forms salt and water."],
+ ["A substance that can react with both acids and bases is called:",["Amphoteric","Inert in every case","Only acidic","Only basic"],0,"Amphoteric substances can show both behaviours."],
+ ["A buffer solution mainly resists changes in:",["pH","Mass of the container","The colour of every object","Gravity"],0,"Buffers help keep solution pH relatively stable."],
+ ["Which statement is correct?",["Strong and concentrated mean the same thing","Unknown chemicals should be tasted","Acid strength and concentration are different","All salts make neutral solutions"],2,"Strength and concentration are different concepts."],
+ ["Blue litmus in an acidic solution typically turns:",["Red","Green","Black","Blue forever"],0,"Blue litmus turns red in acidic solution."]
+];
+let chemCurrent=0, chemQuizIndex=0, chemScore=0, chemSelected=-1, chemAnswered=false;
+let chemDone=JSON.parse(localStorage.getItem('bb_chem_done')||'[]');
+function renderChemistry(filter=''){
+ const list=document.getElementById('chemTopics'); if(!list)return; list.innerHTML='';
+ CHEM_TOPICS.forEach((t,i)=>{if(filter&&!t.title.toLowerCase().includes(filter.toLowerCase()))return;const b=document.createElement('button');b.className=chemDone.includes(i)?'done':'';b.innerHTML=(chemDone.includes(i)?'✓ ':'')+t.title;b.onclick=()=>openChemTopic(i);list.appendChild(b)});
+ if(!list.children.length)list.innerHTML='<div class="answer">No matching Chemistry topic found.</div>';
+ if(!filter || !document.getElementById('chemDetail').dataset.opened)openChemTopic(chemCurrent);
+ renderChemQuiz();
+}
+function openChemTopic(i){chemCurrent=i;const t=CHEM_TOPICS[i],d=document.getElementById('chemDetail');d.dataset.opened='1';d.innerHTML=`<span class="badge">CHEMISTRY • TOPIC ${i+1}/${CHEM_TOPICS.length}</span><h2>${t.title}</h2><p><b>Definition / Explanation:</b> ${t.def}</p><div class="answer"><b>Example:</b><br>${t.example}</div><div class="answer"><b>Board-exam key point:</b><br>${t.key}</div><div class="answer"><b>Common mistake / safety:</b><br>${t.remember}</div><div class="actions"><button class="primary" onclick="toggleChemDone(${i})">${chemDone.includes(i)?'✓ Completed':'Mark as completed'}</button><button onclick="speakChem(${i})">🔊 Hear topic</button><button onclick="openChemTopic(${(i+1)%CHEM_TOPICS.length})">Next topic →</button></div><div class="lesson-nav"><button onclick="openChemTopic((${i}-1+CHEM_TOPICS.length)%CHEM_TOPICS.length)">← Previous</button><select aria-label="Jump to Chemistry topic" onchange="openChemTopic(+this.value)">${CHEM_TOPICS.map((v,j)=>`<option value="${j}" ${j===i?'selected':''}>${j+1}. ${v.title.replace(/^\d+\. /,'')}</option>`).join('')}</select><button onclick="openChemTopic((${i}+1)%CHEM_TOPICS.length)">Next →</button></div>`;}
+function toggleChemDone(i){chemDone.includes(i)?chemDone=chemDone.filter(x=>x!==i):chemDone.push(i);localStorage.setItem('bb_chem_done',JSON.stringify(chemDone));renderChemistry(document.getElementById('chemSearch').value);openChemTopic(i);}
+function speakChem(i){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(CHEM_TOPICS[i].title+'. '+CHEM_TOPICS[i].def+'. '+CHEM_TOPICS[i].example));}
+function renderChemQuiz(){const box=document.getElementById('chemQuiz');if(!box)return;if(chemQuizIndex>=CHEM_Q.length){const pct=Math.round(chemScore/CHEM_Q.length*100);box.innerHTML=`<div class="answer ok"><h3>Practice complete!</h3><p>Score: <b>${chemScore}/${CHEM_Q.length}</b> (${pct}%)</p></div><div class="actions"><button class="primary" onclick="restartChemQuiz()">🔄 Restart Chemistry Quiz</button></div>`;return}const q=CHEM_Q[chemQuizIndex];box.innerHTML=`<div class="progress"><i style="width:${chemQuizIndex/CHEM_Q.length*100}%"></i></div><p><b>Question ${chemQuizIndex+1}/${CHEM_Q.length}</b> • Score ${chemScore}</p><h3>${q[0]}</h3>${q[1].map((o,i)=>`<button class="chem-option" style="${chemAnswered&&i===q[2]?'border-color:#4ce0ad':''}" onclick="selectChemAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}<div id="chemFeedback" class="answer ${chemAnswered?(chemSelected===q[2]?'ok':'bad'):''}">${chemAnswered?q[3]:''}</div><div class="actions">${chemAnswered?'<button class="primary" onclick="nextChemQuestion()">Next question →</button>':'<button class="primary" onclick="submitChemAnswer()">Submit answer</button>'}<button onclick="restartChemQuiz()">🔄 Restart Quiz</button></div>`;}
+function selectChemAnswer(i){if(chemAnswered)return;chemSelected=i;document.querySelectorAll('#chemQuiz .chem-option').forEach((b,j)=>b.style.borderColor=j===i?'#28e2f3':'');}
+function submitChemAnswer(){if(chemSelected<0){showToast('Please select an answer first');return}chemAnswered=true;if(chemSelected===CHEM_Q[chemQuizIndex][2])chemScore++;renderChemQuiz();}
+function nextChemQuestion(){chemQuizIndex++;chemSelected=-1;chemAnswered=false;renderChemQuiz();}
+function restartChemQuiz(){chemQuizIndex=0;chemScore=0;chemSelected=-1;chemAnswered=false;renderChemQuiz();}
+document.getElementById('chemSearch').addEventListener('input',e=>renderChemistry(e.target.value));
+renderChemistry();
+</script>
+
+
+
+<script id="bb-carbon-compounds-module">
+// Separate Chapter 2 module. Existing Physics and Acid, Base and Salt modules are preserved.
+const CARBON_TOPICS = [
+{title:"1. Introduction to Carbon Compounds",def:"Carbon compounds are substances that contain carbon. Organic chemistry is the branch of chemistry that mainly studies hydrocarbons and their derivatives.",example:"Cooking oil, soap, medicines, fuels and many materials around us contain organic compounds.",key:"Carbon is the essential element in organic compounds. Hydrogen, oxygen, nitrogen, sulphur, phosphorus and halogens may also be present.",remember:"Some carbon compounds, such as carbon monoxide, carbon dioxide, carbonates and carbides, are generally treated as inorganic compounds."},
+{title:"2. Organic Compounds",def:"Organic compounds usually contain carbon atoms covalently bonded with atoms such as hydrogen, oxygen or nitrogen.",example:"Methane (CH₄), ethanol (C₂H₅OH) and chloroform (CHCl₃).",key:"Most organic compounds have covalent bonds.",remember:"Do not assume that every compound containing carbon is classified as organic."},
+{title:"3. Vital Force Theory and Friedrich Wöhler",def:"Vital Force Theory claimed that organic compounds could only be made inside living organisms. In 1828, Friedrich Wöhler prepared urea in a laboratory from ammonium cyanate, challenging this theory.",example:"Ammonium cyanate → urea (NH₄OCN → NH₂CONH₂).",key:"Wöhler's laboratory preparation of urea in 1828 was an important event in the history of organic chemistry.",remember:"The experiment showed that an organic compound could be prepared from an inorganic substance in a laboratory."},
+{title:"4. General Characteristics of Organic Compounds",def:"Organic compounds commonly have covalent bonds, are often combustible, and usually have lower melting and boiling points than ionic compounds.",example:"Many organic substances burn in air and produce carbon dioxide and water when combustion is complete.",key:"They are generally poor conductors of electricity and often react at slower rates under specific conditions.",remember:"These are general trends; individual organic compounds can behave differently."},
+{title:"5. Representation of Organic Compounds",def:"Organic compounds can be represented by molecular, structural, condensed, and dot-and-cross (electronic) formulae.",example:"Butane has molecular formula C₄H₁₀. Its structural formula shows how the atoms are connected.",key:"Each formula gives a different type of information about the compound.",remember:"A molecular formula tells the number of each type of atom, but it does not show the exact arrangement of atoms."},
+{title:"6. Molecular Formula",def:"A molecular formula shows the exact number of atoms of each element in one molecule of a compound.",example:"C₄H₁₀ shows that one butane molecule contains 4 carbon atoms and 10 hydrogen atoms.",key:"The molecular formula gives the actual number of atoms in a molecule.",remember:"Do not confuse molecular formula with structural formula."},
+{title:"7. Structural Formula",def:"A structural formula shows how the atoms in a molecule are arranged and connected by bonds. A single bond is shown by one line, a double bond by two lines and a triple bond by three lines.",example:"Ethane: CH₃–CH₃; ethene: CH₂=CH₂; ethyne: HC≡CH.",key:"Different compounds can have the same molecular formula but different structural formulae.",remember:"The arrangement of atoms matters because it can change a compound's properties."},
+{title:"8. Condensed and Dot-and-Cross Formulae",def:"A condensed formula writes groups of atoms in a shorter form. A dot-and-cross formula shows the electrons shared between atoms.",example:"Butane can be written as CH₃CH₂CH₂CH₃. A dot-and-cross diagram shows shared electron pairs.",key:"Condensed formula saves space; dot-and-cross formula explains covalent bonding.",remember:"A condensed formula may hide some bond details that are visible in a structural formula."},
+{title:"9. Classification of Organic Compounds",def:"Organic compounds are broadly classified as open-chain compounds and cyclic compounds. Open-chain compounds may be straight-chain or branched-chain.",example:"n-Butane is straight-chain; isobutane is branched-chain; benzene is cyclic and aromatic.",key:"Cyclic compounds may be alicyclic, aromatic or heterocyclic, depending on their ring structure.",remember:"A heterocyclic ring contains at least one atom other than carbon, such as nitrogen, oxygen or sulphur."},
+{title:"10. Why So Many Carbon Compounds Exist",def:"Carbon forms a very large number of compounds because of catenation, isomerism and the strong covalent bonds it forms.",example:"Carbon atoms can form long chains, branched chains and rings.",key:"Catenation means the ability of an element's atoms to join with one another to form chains or rings.",remember:"Carbon shows strong catenation because carbon–carbon bonds are relatively strong."},
+{title:"11. Isomerism",def:"Isomerism occurs when compounds have the same molecular formula but different arrangements of atoms or different structural formulae. Such compounds are called isomers.",example:"Pentane (C₅H₁₂) has three structural isomers.",key:"Isomerism increases the number of different organic compounds.",remember:"Same molecular formula does not always mean same structure or same properties."},
+{title:"12. Sources of Organic Compounds",def:"The two main sources described in the textbook are living things and minerals. Important mineral sources include coal, petroleum and natural gas.",example:"Plants provide oils and carbohydrates; petroleum and natural gas provide many hydrocarbons.",key:"Coal, petroleum and natural gas are fossil-fuel sources of organic compounds.",remember:"Fossil fuels form over very long periods and are non-renewable on a human timescale."},
+{title:"13. Coal and Its Formation",def:"Coal is a solid fossil fuel formed from ancient plant remains buried underground and changed by pressure, heat and time. The natural conversion of plant material into coal is called carbonization.",example:"The textbook describes stages such as wood, peat, lignite and higher-carbon coal, including anthracite.",key:"The carbon percentage generally increases as coalification progresses.",remember:"Coal is a mixture of substances, not one pure chemical compound."},
+{title:"14. Petroleum, Natural Gas and Fractional Distillation",def:"Petroleum is a naturally occurring mixture of hydrocarbons. Fractional distillation separates it into fractions according to their different boiling-point ranges.",example:"Petroleum fractions include gases, petrol, kerosene, diesel and heavier fractions. Natural gas is mainly methane.",key:"Fractional distillation separates components based on boiling-point differences.",remember:"A petroleum fraction is a mixture of hydrocarbons with similar boiling-point ranges, not necessarily one pure compound."},
+{title:"15. Uses of Organic Compounds",def:"Organic compounds are used as fuels, medicines, clothing fibres, household materials and raw materials for many industries.",example:"Petrol is used as fuel; cotton contains cellulose; many medicines are organic compounds.",key:"Organic compounds are important in daily life, agriculture, transport, health and manufacturing.",remember:"Use fuels and chemicals safely and follow product instructions."},
+{title:"16. Homologous Series",def:"A homologous series is a family of organic compounds with the same functional group and a common general formula. Consecutive members differ by a –CH₂– unit, which has a mass of 14 u.",example:"Methane CH₄, ethane C₂H₆ and propane C₃H₈ belong to the alkane series.",key:"Members have similar chemical properties and a gradual change in physical properties.",remember:"The general formula depends on the family: alkanes CₙH₂ₙ₊₂, alkenes CₙH₂ₙ and alkynes CₙH₂ₙ₋₂."},
+{title:"17. Alkanes and Alkyl Radicals",def:"Alkanes are saturated hydrocarbons containing only carbon–carbon single bonds. An alkyl group is formed when one hydrogen atom is removed from an alkane.",example:"Methane CH₄ gives methyl –CH₃; ethane C₂H₆ gives ethyl –C₂H₅.",key:"The general formula of open-chain alkanes is CₙH₂ₙ₊₂. The general formula of alkyl groups is CₙH₂ₙ₊₁.",remember:"An alkyl group is usually written as R– in organic chemistry."},
+{title:"18. Saturated and Unsaturated Hydrocarbons",def:"Saturated hydrocarbons have only single carbon–carbon bonds. Unsaturated hydrocarbons contain at least one carbon–carbon double or triple bond.",example:"Ethane is saturated; ethene has a double bond; ethyne has a triple bond.",key:"Alkanes are saturated; alkenes and alkynes are unsaturated.",remember:"Unsaturated hydrocarbons generally undergo addition reactions more readily than alkanes."},
+{title:"19. Nomenclature — Naming Organic Compounds",def:"Nomenclature is the system used to give organic compounds clear and standard names. IUPAC names are based on the longest suitable carbon chain, its numbering and its branches or multiple bonds.",example:"A two-carbon alkane is ethane; a three-carbon alkane is propane.",key:"Choose the longest chain, number it from the end nearest the branch or multiple bond, and show branch positions in the name.",remember:"For alkenes and alkynes, the parent chain must include the double or triple bond, and numbering should give that bond the lowest suitable number."},
+{title:"20. Functional Groups",def:"A functional group is an atom or group of atoms that gives an organic compound its characteristic chemical properties.",example:"Alcohols contain –OH; haloalkanes contain –X; aldehydes contain –CHO; ketones contain >C=O.",key:"Examples include alkenes C=C, alkynes C≡C, alcohols –OH, ethers –O–, aldehydes –CHO and ketones –CO–.",remember:"Compounds in the same family often show similar chemical reactions because they have the same functional group."}
+];
+const CARBON_Q=[
+["Organic chemistry mainly studies compounds of:",["Carbon and their derivatives","Only sodium","Only metals","Only noble gases"],0,"Organic chemistry mainly deals with hydrocarbons and their derivatives."],
+["Who prepared urea in a laboratory in 1828?",["Newton","Friedrich Wöhler","Einstein","Dalton"],1,"Friedrich Wöhler prepared urea from ammonium cyanate."],
+["Which formula shows the exact number of atoms in a molecule?",["Molecular formula","Only a name","Word equation","State symbol"],0,"A molecular formula gives the actual number of each type of atom."],
+["The ability of carbon atoms to join with each other is called:",["Neutralization","Catenation","Distillation","Evaporation"],1,"Catenation is the linking of atoms of the same element into chains or rings."],
+["Pentane (C₅H₁₂) has how many structural isomers?",["One","Two","Three","Five"],2,"Pentane has three structural isomers."],
+["Which is a major natural source of hydrocarbons?",["Petroleum","Pure water","Sand","Table salt"],0,"Petroleum is a natural mixture containing many hydrocarbons."],
+["Fractional distillation separates petroleum fractions by their:",["Colour only","Boiling-point ranges","Magnetic properties","Mass alone"],1,"Different fractions have different boiling-point ranges."],
+["The general formula of open-chain alkanes is:",["CₙH₂ₙ₊₂","CₙH₂ₙ","CₙH₂ₙ₋₂","CₙHₙ"],0,"Alkanes have the general formula CₙH₂ₙ₊₂."],
+["Which compound is unsaturated?",["Ethane","Methane","Ethene","Propane"],2,"Ethene contains a carbon–carbon double bond."],
+["A functional group mainly determines an organic compound's:",["Characteristic chemical properties","Colour of its container","Mass of the beaker","Room temperature"],0,"Functional groups give organic families their characteristic chemical behaviour."]
+];
+let carbonCurrent=0,carbonQuizIndex=0,carbonScore=0,carbonSelected=-1,carbonAnswered=false;
+let carbonDone=JSON.parse(localStorage.getItem('bb_carbon_done')||'[]');
+function renderCarbon(filter=''){const list=document.getElementById('carbonTopics');if(!list)return;list.innerHTML='';CARBON_TOPICS.forEach((t,i)=>{if(filter&&!t.title.toLowerCase().includes(filter.toLowerCase()))return;const b=document.createElement('button');b.className=carbonDone.includes(i)?'done':'';b.textContent=(carbonDone.includes(i)?'✓ ':'')+t.title;b.onclick=()=>openCarbonTopic(i);list.appendChild(b)});if(!list.children.length)list.innerHTML='<div class="answer">No matching topic found.</div>';if(!filter||!document.getElementById('carbonDetail').dataset.opened)openCarbonTopic(carbonCurrent);renderCarbonQuiz();}
+function openCarbonTopic(i){carbonCurrent=i;const t=CARBON_TOPICS[i],d=document.getElementById('carbonDetail');d.dataset.opened='1';d.innerHTML=`<span class="badge">CARBON & ITS COMPOUNDS • TOPIC ${i+1}/${CARBON_TOPICS.length}</span><h2>${t.title}</h2><p><b>Definition / Explanation:</b> ${t.def}</p><div class="answer"><b>Example:</b><br>${t.example}</div><div class="answer"><b>Important point:</b><br>${t.key}</div><div class="answer"><b>Remember:</b><br>${t.remember}</div><div class="actions"><button class="primary" onclick="toggleCarbonDone(${i})">${carbonDone.includes(i)?'✓ Completed':'Mark as completed'}</button><button onclick="speakCarbon(${i})">🔊 Hear topic</button><button onclick="openCarbonTopic(${(i+1)%CARBON_TOPICS.length})">Next topic →</button></div><div class="lesson-nav"><button onclick="openCarbonTopic((${i}-1+CARBON_TOPICS.length)%CARBON_TOPICS.length)">← Previous</button><select aria-label="Jump to Carbon topic" onchange="openCarbonTopic(+this.value)">${CARBON_TOPICS.map((v,j)=>`<option value="${j}" ${j===i?'selected':''}>${j+1}. ${v.title.replace(/^\d+\. /,'')}</option>`).join('')}</select><button onclick="openCarbonTopic((${i}+1)%CARBON_TOPICS.length)">Next →</button></div>`;}
+function toggleCarbonDone(i){carbonDone.includes(i)?carbonDone=carbonDone.filter(x=>x!==i):carbonDone.push(i);localStorage.setItem('bb_carbon_done',JSON.stringify(carbonDone));renderCarbon(document.getElementById('carbonSearch').value);openCarbonTopic(i);}
+function speakCarbon(i){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(CARBON_TOPICS[i].title+'. '+CARBON_TOPICS[i].def+'. '+CARBON_TOPICS[i].example));}
+function renderCarbonQuiz(){const box=document.getElementById('carbonQuiz');if(!box)return;if(carbonQuizIndex>=CARBON_Q.length){const pct=Math.round(carbonScore/CARBON_Q.length*100);box.innerHTML=`<div class="answer ok"><h3>Quiz complete!</h3><p>Score: <b>${carbonScore}/${CARBON_Q.length}</b> (${pct}%)</p></div><div class="actions"><button class="primary" onclick="restartCarbonQuiz()">🔄 Restart Quiz</button></div>`;return;}const q=CARBON_Q[carbonQuizIndex];box.innerHTML=`<div class="progress"><i style="width:${carbonQuizIndex/CARBON_Q.length*100}%"></i></div><p><b>Question ${carbonQuizIndex+1}/${CARBON_Q.length}</b> • Score ${carbonScore}</p><h3>${q[0]}</h3>${q[1].map((o,i)=>`<button class="chem-option" style="${carbonAnswered&&i===q[2]?'border-color:#4ce0ad':''}" onclick="selectCarbonAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}<div class="answer ${carbonAnswered?(carbonSelected===q[2]?'ok':'bad'):''}">${carbonAnswered?q[3]:''}</div><div class="actions">${carbonAnswered?'<button class="primary" onclick="nextCarbonQuestion()">Next question →</button>':'<button class="primary" onclick="submitCarbonAnswer()">Submit answer</button>'}<button onclick="restartCarbonQuiz()">🔄 Restart Quiz</button></div>`;}
+function selectCarbonAnswer(i){if(carbonAnswered)return;carbonSelected=i;document.querySelectorAll('#carbonQuiz .chem-option').forEach((b,j)=>b.style.borderColor=j===i?'#28e2f3':'');}
+function submitCarbonAnswer(){if(carbonSelected<0){showToast('Please select an answer first');return;}carbonAnswered=true;if(carbonSelected===CARBON_Q[carbonQuizIndex][2])carbonScore++;renderCarbonQuiz();}
+function nextCarbonQuestion(){carbonQuizIndex++;carbonSelected=-1;carbonAnswered=false;renderCarbonQuiz();}
+function restartCarbonQuiz(){carbonQuizIndex=0;carbonScore=0;carbonSelected=-1;carbonAnswered=false;renderCarbonQuiz();}
+document.getElementById('carbonSearch').addEventListener('input',e=>renderCarbon(e.target.value));
+renderCarbon();
+</script>
+
+<script id="bb-chemistry-animations">
+// Additional Chemistry-only animation renderers. Existing Physics renderers and lesson data remain untouched.
+function chemText(ctx,txt,x,y,color="#eafaff",size=14){ctx.save();ctx.fillStyle=color;ctx.font=`700 ${size}px system-ui`;ctx.fillText(txt,x,y);ctx.restore()}
+function chemDot(ctx,x,y,r,fill,glow=0){ctx.save();ctx.fillStyle=fill;ctx.shadowColor=fill;ctx.shadowBlur=glow;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore()}
+function drawChemPH(ctx,w,h){const x=24,y=h*.48,bw=w-48,bh=28,t=anim.t;chemText(ctx,"ACIDIC",x,y-48,"#ff7d88",13);chemText(ctx,"NEUTRAL",w*.45,y-48,"#70efb4",13);chemText(ctx,"BASIC",w-90,y-48,"#8a9cff",13);const g=ctx.createLinearGradient(x,0,x+bw,0);[[0,"#f04455"],[.22,"#ff9c45"],[.5,"#53dca0"],[.76,"#3d9dff"],[1,"#9b75ff"]].forEach(a=>g.addColorStop(a[0],a[1]));ctx.save();ctx.shadowColor="#54dfff";ctx.shadowBlur=20;ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(x,y,bw,bh,14);ctx.fill();ctx.restore();for(let i=0;i<=14;i++){const xx=x+bw*i/14;ctx.strokeStyle="rgba(255,255,255,.65)";ctx.beginPath();ctx.moveTo(xx,y+bh+4);ctx.lineTo(xx,y+bh+12);ctx.stroke();chemText(ctx,String(i),xx-4,y+bh+30,"#cfe9ff",10)}const px=x+bw*(.5+.47*Math.sin(t*.55));chemDot(ctx,px,y+bh/2,10,"#fff",18);chemText(ctx,"pH marker",Math.max(x,Math.min(w-95,px-35)),y-15,"#ffffff",12);chemText(ctx,"pH 0",x,y+bh+58);chemText(ctx,"pH 7",x+bw*.48,y+bh+58,"#70efb4");chemText(ctx,"pH 14",w-70,y+bh+58)}
+function drawChemNeutral(ctx,w,h){const t=anim.t,cy=h*.48,left=w*.23,right=w*.77;chemText(ctx,"ACID",left-24,35,"#ff8292",14);chemText(ctx,"BASE",right-22,35,"#73aaff",14);chemText(ctx,"SALT + WATER",w*.38,h-28,"#79f3c4",13);for(let i=0;i<5;i++){const phase=(t*.7+i*.2)%1;const x=left+(right-left)*phase;chemDot(ctx,x,cy-34,7,"#ff6f83",12);chemText(ctx,"H⁺",x-9,cy-48,"#ff9aa8",11);const xb=right-(right-left)*phase;chemDot(ctx,xb,cy+35,7,"#63a9ff",12);chemText(ctx,"OH⁻",xb-14,cy+60,"#91c4ff",11)}chemText(ctx,"H⁺  +  OH⁻",w*.36,cy-4,"#ffffff",19);chemText(ctx,"→",w*.49,cy+28,"#ffe08a",22);chemDot(ctx,w*.53,cy+5,11,"#7cf2d0",16);chemText(ctx,"H₂O",w*.57,cy+10,"#7cf2d0",16);ctx.save();ctx.setLineDash([5,6]);ctx.strokeStyle="rgba(130,210,255,.45)";ctx.beginPath();ctx.moveTo(w*.5,55);ctx.lineTo(w*.5,h-55);ctx.stroke();ctx.restore()}
+function drawChemIons(ctx,w,h){const t=anim.t;chemText(ctx,"ACID IN WATER",18,28,"#ff8998",13);chemText(ctx,"BASE IN WATER",w*.55,28,"#83b6ff",13);for(let i=0;i<7;i++){const yy=65+(i%4)*45,xx=25+(i*47+t*18)%(w*.42);chemDot(ctx,xx,yy,7,"#ff7187",13);chemText(ctx,"H⁺",xx-8,yy-13,"#ffdce2",10);const x2=w*.57+(i*43+t*14)%(w*.38);chemDot(ctx,x2,yy,7,"#579dff",13);chemText(ctx,"OH⁻",x2-13,yy-13,"#d8e8ff",10)}chemText(ctx,"HCl → H⁺ + Cl⁻",18,h-35,"#ff9baa",13);chemText(ctx,"NaOH → Na⁺ + OH⁻",w*.53,h-35,"#9bc4ff",13)}
+function drawChemIndicator(ctx,w,h){const x=24,y=h*.35,bw=w-48,bh=64,g=ctx.createLinearGradient(x,0,x+bw,0);[[0,"#ed394e"],[.2,"#ff8b3d"],[.4,"#f4d65c"],[.55,"#56d98c"],[.75,"#398be8"],[1,"#7650c8"]].forEach(a=>g.addColorStop(a[0],a[1]));ctx.save();ctx.shadowColor="#4de7ed";ctx.shadowBlur=18;ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(x,y,bw,bh,15);ctx.fill();ctx.restore();chemText(ctx,"ACIDIC",x,y-18,"#ff8b9a",12);chemText(ctx,"NEUTRAL",w*.45,y-18,"#7cf0bd",12);chemText(ctx,"BASIC",w-82,y-18,"#9caeff",12);const pos=x+bw*(.5+.47*Math.sin(anim.t*.6));ctx.save();ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(pos,y-8);ctx.lineTo(pos,y+bh+10);ctx.stroke();chemDot(ctx,pos,y+bh/2,8,"#ffffff",15);ctx.restore();chemText(ctx,"Universal indicator colour (illustrative)",x,y+bh+42,"#d6eaff",12)}
+function drawChemBuffer(ctx,w,h){const t=anim.t;chemText(ctx,"ORDINARY SOLUTION",18,28,"#ff9aa5",12);chemText(ctx,"BUFFER SOLUTION",w*.55,28,"#76edc0",12);const base=h*.55;for(let i=0;i<2;i++){const x0=i?w*.58:18,ww=w*.36;ctx.strokeStyle=i?"#69e8bb":"#ff8998";ctx.lineWidth=3;ctx.beginPath();for(let j=0;j<=80;j++){const x=x0+ww*j/80;const amp=i?10:34;const y=base+Math.sin(j*.12+t*1.4)*amp*(.55+.45*Math.sin(t*.3));if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();chemText(ctx,i?"Smaller pH change":"Larger pH change",x0,base+65,i?"#83f2c8":"#ff9ba7",11)}for(let i=0;i<4;i++){const xx=30+((t*24+i*83)%(w-60));chemDot(ctx,xx,base-55,5,i%2?"#ff758c":"#70aaff",9)}chemText(ctx,"Small additions of acid/base",18,h-20,"#d6eaff",12)}
+</script>
+
+
+<script id="bb-gamification-engine">
+(()=> {
+ const KEY="bb_game_v1", today=()=>new Date().toLocaleDateString("en-CA");
+ let g=JSON.parse(localStorage.getItem(KEY)||'{"xp":0,"streak":0,"lastDay":"","todayXp":0,"today":"", "badges":[]}');
+ const achievements=[
+  ["first","🌱","First Steps","Complete 1 topic",()=>done.length>=1],
+  ["five","📚","Curious Mind","Complete 5 topics",()=>done.length>=5],
+  ["all","🎓","Wave Scholar","Complete every Physics topic",()=>done.length>=T.length],
+  ["quiz","🎯","Quiz Starter","Finish a quiz",()=>g.badges.includes("quiz")],
+  ["perfect","💯","Perfect Run","Get 100% in a quiz",()=>g.badges.includes("perfect")],
+  ["streak","🔥","Consistency","Study on 3 days",()=>g.streak>=3]
+ ];
+ function save(){localStorage.setItem(KEY,JSON.stringify(g));draw()}
+ function dayCheck(){let d=today();if(g.today!==d){g.today=d;g.todayXp=0}if(g.lastDay!==d){let prev=new Date();prev.setDate(prev.getDate()-1);let p=prev.toLocaleDateString("en-CA");g.streak=(g.lastDay===p)?g.streak+1:1;g.lastDay=d} }
+ function addXP(n,label="XP"){dayCheck();g.xp+=n;g.todayXp+=n;save();floatXP("+"+n+" XP");if(label)showToast("✨ "+label+" • +"+n+" XP")}
+ function unlock(id){if(!g.badges.includes(id)){g.badges.push(id);let b=achievements.find(x=>x[0]===id);if(b){addXP(25,"Badge unlocked: "+b[2]);burst();}}}
+ function draw(){let level=Math.floor(g.xp/100)+1,into=g.xp%100;let set=(id,v)=>{let e=document.getElementById(id);if(e)e.textContent=v};set("bbLevel",level);set("bbXpText",into+" / 100 XP");set("bbXpTotal","✨ "+g.xp+" XP total");set("bbStreak",g.streak);set("bbTodayXp",g.todayXp);set("bbBadgeCount",g.badges.length+"/"+achievements.length);let bar=document.getElementById("bbXpBar");if(bar)bar.style.width=into+"%";let holder=document.getElementById("bbBadges");if(holder)holder.innerHTML=achievements.map(a=>`<div class="bb-ach ${g.badges.includes(a[0])?"unlocked":""}"><span class="em">${a[1]}</span><strong>${a[2]}</strong><small>${a[3]}</small></div>`).join("");}
+ function floatXP(t){let e=document.createElement("div");e.className="bb-float-xp";e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),1000)}
+ function burst(){for(let i=0;i<22;i++){let e=document.createElement("i");e.className="bb-confetti";e.style.left="50%";e.style.top="42%";e.style.background=["#43eaff","#a58aff","#62f4bb","#ffd166"][i%4];e.style.setProperty("--dx",(Math.random()*260-130)+"px");e.style.setProperty("--dy",(Math.random()*220-110)+"px");document.body.appendChild(e);setTimeout(()=>e.remove(),1100)}}
+ // award topic completion
+ const oldToggle=window.toggle;window.toggle=function(i){let was=done.includes(i);oldToggle(i);if(!was){addXP(10,"Topic completed");unlock("first");unlock("five");unlock("all");}};
+ // award main quiz points; preserve original answer behavior
+ const oldSubmit=window.submitQ;window.submitQ=function(){if(sel<0){oldSubmit();return}let correct=sel===Q[quizI][2];oldSubmit();if(correct){addXP(10,"Correct answer");let exp=document.getElementById("exp");if(exp){exp.classList.add("bb-correct-pop");burst()}}};
+ // award quiz finish (main quiz + chemistry/carbon)
+ const oldRender=window.renderQuiz;window.renderQuiz=function(){if(quizI>=Q.length&&!g.badges.includes("quiz")){unlock("quiz");if(score===Q.length)unlock("perfect")}oldRender()};
+ const oldChem=window.renderChemQuiz;if(oldChem)window.renderChemQuiz=function(){if(typeof chemQuizIndex!=="undefined"&&chemQuizIndex>=CHEM_Q.length&&!g.badges.includes("quiz"))unlock("quiz");oldChem()};
+ const oldCarbon=window.renderCarbonQuiz;if(oldCarbon)window.renderCarbonQuiz=function(){if(typeof carbonQuizIndex!=="undefined"&&carbonQuizIndex>=CARBON_Q.length&&!g.badges.includes("quiz"))unlock("quiz");oldCarbon()};
+ dayCheck();draw();window.addEventListener("load",draw);
+})();
+</script>
+</body>
+</html>
